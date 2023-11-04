@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BugStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum BugPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ProjectRole {
+  REPORTER
+  DEVELOPER
+  MANAGER
+}
+
+model ProjectMembership {
+  id         Int         @id @default(autoincrement())
+  user_id    Int
+  project_id Int
+  role       ProjectRole
+  user       User        @relation(fields: [user_id], references: [id])
+  project    Project     @relation(fields: [project_id], references: [id])
+
+  @@map("member_project")
+}
+
+model User {
+  id            Int                 @id @default(autoincrement())
+  name          String?
+  username      String?
+  gh_username   String?
+  email         String?             @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  projectsOwned Project[]
+  comments      Comments[]
+  bugsReported  Bug[]               @relation("BugReporter")
+  bugsAssigned  Bug[]               @relation("BugDeveloper")
+  projects      ProjectMembership[]
+
+  @@map("users")
+}
+
+model Account {
+  id                       Int     @id @default(autoincrement())
+  userId                   Int
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?
+  refresh_token_expires_in Int?
+  access_token             String?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+  oauth_token_secret       String?
+  oauth_token              String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Bug {
+  id           Int         @id @default(autoincrement())
+  title        String
+  description  String?
+  reporter_id  Int
+  developer_id Int
+  project_id   Int
+  status       BugStatus   @default(NEW)
+  priorty      BugPriority @default(LOW)
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+  reporter     User        @relation("BugReporter", fields: [reporter_id], references: [id])
+  developer    User?       @relation("BugDeveloper", fields: [developer_id], references: [id])
+  project      Project     @relation(fields: [project_id], references: [id])
+  Comments     Comments[]
+
+  @@map("bugs")
+}
+
+model Project {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  description       String?
+  owner_id          Int
+  owner             User                @relation(fields: [owner_id], references: [id])
+  bugs              Bug[]
+  ProjectMembership ProjectMembership[]
+
+  @@map("projects")
+}
+
+model Comments {
+  id      Int    @id @default(autoincrement())
+  body    String
+  user_id Int
+  bug_id  Int
+  user    User   @relation(fields: [user_id], references: [id])
+  bug     Bug    @relation(fields: [bug_id], references: [id])
+
+  @@map("comments")
+}
