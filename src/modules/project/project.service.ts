@@ -1,11 +1,9 @@
 "use server"
 import prisma from '@/lib/prisma';
+import { ProjectDTO } from './project.schema';
 
-export async function createProject() {
-    const project = await prisma.project.create({
-        data: {
-            name: "Test",
-            owner_id: 1
-        }
+export async function createProject(projectDTO: ProjectDTO) {
+    return prisma.project.create({
+        data: projectDTO
     })
-}
+}  

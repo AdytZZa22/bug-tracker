@@ -21,11 +21,9 @@ import { Input } from "@/components/ui/input"
 import React, {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {Icons} from "@/components/Icons";
 import {useToast} from "@/components/ui/use-toast";
-import {createProjectSchema} from "@/modules/project/project.schema";
-import { createProject } from "@/modules/project/project.service"
+import {CreateProjectSchema, createProjectWithoutOwnerSchema} from "@/modules/project/project.schema";
 
 
 export default function AddProject() {
@@ -36,18 +34,18 @@ export default function AddProject() {
         setOpen(true)
     }, [])
 
-    const form = useForm<z.infer<typeof createProjectSchema>>({
-        resolver: zodResolver(createProjectSchema),
+    const form = useForm<CreateProjectSchema>({
+        resolver: zodResolver(createProjectWithoutOwnerSchema),
         defaultValues: {
-            name: "",
-        }
+            name: "",        }
     })
 
-    async function createSite(values: z.infer<typeof createProjectSchema>) {
+    async function createProject(values: CreateProjectSchema) {
 
+        console.log('test');
         setIsLoading(true)
         try {
-            const res = await fetch('/api/v1/create-site', {
+            const res = await fetch('/api/v1/project/create', {
                 method: "POST",
                 body: JSON.stringify(values)
             })
@@ -83,7 +81,7 @@ export default function AddProject() {
                     <DialogDescription>It looks like you do not have any project. You can create one right now!</DialogDescription>
                 </DialogHeader>
                 <Form {...form} >
-                    <form action={createProject} className="space-y-8">
+                    <form onSubmit={form.handleSubmit(createProject)} className="space-y-8">
                         <FormField
                             control={form.control}
                             name="name"

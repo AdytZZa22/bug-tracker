@@ -1,8 +1,9 @@
 import Sidebar from "@/components/Sidebar";
 import AddProject from "@/components/AddProject";
 
+export default async function Home() {
 
-export default function Home() {
+
   return (
     <main className="flex min-h-screen">
         <Sidebar />

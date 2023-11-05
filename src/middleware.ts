@@ -1,12 +1,17 @@
 import { withAuth } from "next-auth/middleware"
 import {getToken} from "next-auth/jwt";
-import {redirect} from "next/navigation";
 import {NextResponse} from "next/server";
 
 
 export default withAuth(
     async function middleware (req) {
         const session = await getToken({req})
+
+        if(req.nextUrl.pathname.startsWith('/api') && session === null) {
+            return NextResponse.json({
+                msg: "You are not allowed here. :)"
+            });
+        }
 
         if(session && req.nextUrl.pathname.startsWith('/login')) {
             return NextResponse.redirect(new URL('/', req.url))
@@ -16,6 +21,11 @@ export default withAuth(
         callbacks: {
             authorized: async ({ req, token }) => {
 
+                if(req.nextUrl.pathname.startsWith('/api') && token === null) {
+                    return true;
+                }
+
+                
                 return !(!req.nextUrl.pathname.startsWith('/login') &&
                     token === null);
 

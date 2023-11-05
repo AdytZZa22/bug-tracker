@@ -16,5 +16,14 @@ export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     session: {
         strategy: "jwt"
+    },
+    callbacks: {
+        async session({token, session}) {
+            
+            if(session.user) {
+                session.user.id = token.sub
+            }
+            return session
+        }
     }
 }
