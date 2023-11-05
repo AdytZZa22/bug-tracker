@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 import { HiOutlineViewGridAdd } from "react-icons/hi";
 import { LuZap } from "react-icons/lu";
@@ -13,6 +14,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import {Badge} from "@/components/ui/badge";
+import {signOut} from "next-auth/react";
 export default function Sidebar() {
     return <div className="flex flex-col w-64 h-screen border-r-2 border-r-gray-200">
         <div className="flex justify-center pb-6">
@@ -21,13 +23,13 @@ export default function Sidebar() {
 
         <div className="flex-grow">
 
-            <div className="flex flex-col py-4 hover:bg-gray-100">
+            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
                 <a href="#" className="flex items-center text-gray-400 border-r-4 border-r-black px-8">
                     <HiOutlineViewGridAdd className="me-3" size={24} /><span className="text-[15px]">Overview</span>
                 </a>
             </div>
 
-            <div className="flex flex-col hover:bg-gray-100">
+            <div className="flex flex-col hover:bg-gray-100 cursor-pointer">
                 <div className="text-gray-400 px-8">
                     <Accordion type="single" collapsible>
                         <AccordionItem value="item-1">
@@ -57,28 +59,33 @@ export default function Sidebar() {
 
             </div>
 
-            <div className="flex flex-col py-4 hover:bg-gray-100">
+            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
                 <a href="#" className="flex items-center text-gray-400 border-r-black px-8">
                     <PiRocket className="me-3" size={24} /><span className="text-[15px]">Releases</span>
                 </a>
             </div>
 
-            <div className="flex flex-col py-4 hover:bg-gray-100">
+            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
                 <a href="#" className="flex items-center justify-between text-gray-400 border-r-black px-8">
                     <div className="flex items-center">
-                        <AiOutlineBug className="me-3" size={24} /><span className="text-[15px]">Reports</span>
+                        <AiOutlineBug className="me-3" size={24} />
+                        <span className="text-[15px]">Reports</span>
                     </div>
                     <Badge variant="info">36</Badge>
                 </a>
             </div>
 
-            <div className="flex flex-col py-4 hover:bg-gray-100">
-                <a href="#" className="flex items-center text-gray-400 border-r-black px-8">
-                    <BsChatDots className="me-3" size={24} /><span className="text-[15px]">Messages</span>
+            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
+                <a href="#" className="flex items-center justify-between text-gray-400 border-r-black px-8">
+                     <div className="flex items-center">
+                         <BsChatDots className="me-3" size={24} />
+                         <span className="text-[15px]">Messages</span>
+                     </div>
+                    <Badge variant="info">9+</Badge>
                 </a>
             </div>
 
-            <div className="flex flex-col py-4 hover:bg-gray-100">
+            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
                 <a href="#" className="flex items-center text-gray-400 border-r-black px-8">
                     <IoSettingsOutline className="me-3" size={24} /><span className="text-[15px]">Reports</span>
                 </a>
@@ -87,10 +94,10 @@ export default function Sidebar() {
 
 
         <div className="py-10">
-            <div className="flex flex-col py-4 hover:bg-gray-100">
-                <a href="#" className="flex items-center text-gray-400 border-r-black px-8">
-                    <PiSignOutBold className="me-3" size={24} /><span className="text-[15px]">Logout</span>
-                </a>
+            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
+                    <p onClick={() => signOut()} className="flex items-center text-gray-400 border-r-black px-8">
+                        <PiSignOutBold className="me-3" size={24} /><span className="text-[15px]">Logout</span>
+                    </p>
             </div>
         </div>
     </div>

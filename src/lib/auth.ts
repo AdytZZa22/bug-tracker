@@ -10,5 +10,11 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GOOGLE_SECRET as string
         })
     ],
-    adapter: PrismaAdapter(prisma)
+    pages: {
+        signIn: '/login'
+    },
+    adapter: PrismaAdapter(prisma),
+    session: {
+        strategy: "jwt"
+    }
 }
