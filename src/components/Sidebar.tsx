@@ -15,7 +15,14 @@ import {
 } from "@/components/ui/accordion"
 import {Badge} from "@/components/ui/badge";
 import {signOut} from "next-auth/react";
-export default function Sidebar() {
+import { Project } from "@prisma/client";
+
+
+
+export default function Sidebar({projects}: {projects: Project[]}) {
+
+
+
     return <div className="flex flex-col w-64 h-screen border-r-2 border-r-gray-200">
         <div className="flex justify-center pb-6">
             <Image src="/logo.png" width="150" height="150" alt="" />
@@ -40,18 +47,12 @@ export default function Sidebar() {
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="min-w-full border-l-gray-200 border-l-2 ms-2">
-                                <div className="flex gap-2 items-center p-2 ms-5 hover:bg-black hover:text-white">
-                                    <FiFile size={14}/>
-                                    <span className="text-[12px]">marina.com</span>
-                                </div>
-                                <div className="flex gap-2 items-center p-2 ms-5 mt-2 hover:bg-black hover:text-white">
-                                    <FiFile size={14}/>
-                                    <span className="text-[12px]">marina.com</span>
-                                </div>
-                                <div className="flex gap-2 items-center p-2 ms-5 mt-2 hover:bg-black hover:text-white">
-                                    <FiFile size={14}/>
-                                    <span className="text-[12px]">marina.com</span>
-                                </div>
+                                {projects.map(project => {
+                                    return <div key={project.id} className="flex gap-2 items-center p-2 ms-5 hover:bg-black hover:text-white">
+                                        <FiFile size={14}/>
+                                        <span className="text-[12px]">{project.name}</span>
+                                    </div>
+                                })}
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>

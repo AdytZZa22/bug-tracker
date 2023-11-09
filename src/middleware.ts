@@ -10,6 +10,8 @@ export default withAuth(
         if(req.nextUrl.pathname.startsWith('/api') && session === null) {
             return NextResponse.json({
                 msg: "You are not allowed here. :)"
+            }, {
+                status: 403
             });
         }
 

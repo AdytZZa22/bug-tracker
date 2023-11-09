@@ -1,5 +1,5 @@
 "use client"
-
+import slugify from 'slugify';
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -24,37 +24,62 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Icons} from "@/components/Icons";
 import {useToast} from "@/components/ui/use-toast";
 import {CreateProjectSchema, createProjectWithoutOwnerSchema} from "@/modules/project/project.schema";
+import { Textarea } from "./ui/textarea"
 
 
 export default function AddProject() {
     const [open, setOpen] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
+
     const { toast } = useToast()
-    useEffect(() => {
-        setOpen(true)
-    }, [])
 
     const form = useForm<CreateProjectSchema>({
         resolver: zodResolver(createProjectWithoutOwnerSchema),
         defaultValues: {
-            name: "",        }
+            name: "",
+            description: "",
+            slug: "",
+        }
     })
+
+    const { watch, setValue } = form;
+
+    const name = watch('name')
+    const slug = watch('slug')
+
+    useEffect(() => {
+        setValue('slug', slugify(name, { lower: true}))
+    }, [name])
 
     async function createProject(values: CreateProjectSchema) {
 
-        console.log('test');
         setIsLoading(true)
         try {
             const res = await fetch('/api/v1/project/create', {
                 method: "POST",
-                body: JSON.stringify(values)
+                body: JSON.stringify(values),
+                next: {
+                    tags: ['projects']
+                },
+                cache: "no-cache"
             })
-            await res.json()
+            const data: {
+                success: boolean,
+                field: "slug" | "name",
+                msg: string | undefined
+            } = await res.json()
 
-            toast({
-                title: "✅ Success",
-                description: "Project has been created successfully",
-            })
+            if(!data.success && data.field) {
+                form.setError(data.field, {
+                    type: "manual",
+                    message: data.msg
+                })
+            } else {
+                toast({
+                    title: "✅ Success",
+                    description: "Project has been created successfully",
+                })
+            }
         } catch (e) {
             toast({
                 title: "Error",
@@ -64,9 +89,6 @@ export default function AddProject() {
             setIsLoading(false)
 
         }
-
-
-
     }
 
     return (
@@ -93,6 +115,38 @@ export default function AddProject() {
                                     </FormControl>
                                     <FormDescription>
                                         This is just for its identification.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="slug"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Slug</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="bug-tracker" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                        This will be the path for the project. E.g <strong>bug-tracker</strong>
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Slug</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="Description" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Just a little description about what's happening behind the walls
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

@@ -1,0 +1,139 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table member_project {
+  id Int [pk, increment]
+  user_id Int [not null]
+  project_id Int [not null]
+  role ProjectRole [not null]
+  user users [not null]
+  project projects [not null]
+}
+
+Table users {
+  id Int [pk, increment]
+  name String
+  username String
+  gh_username String
+  email String [unique]
+  emailVerified DateTime
+  image String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  accounts accounts [not null]
+  sessions sessions [not null]
+  projectsOwned projects [not null]
+  comments comments [not null]
+  bugsReported bugs [not null]
+  bugsAssigned bugs [not null]
+  projects member_project [not null]
+}
+
+Table accounts {
+  id Int [pk, increment]
+  userId Int [not null]
+  type String [not null]
+  provider String [not null]
+  providerAccountId String [not null]
+  refresh_token String
+  refresh_token_expires_in Int
+  access_token String
+  expires_at Int
+  token_type String
+  scope String
+  id_token String
+  session_state String
+  oauth_token_secret String
+  oauth_token String
+  user users [not null]
+
+  indexes {
+    (provider, providerAccountId) [unique]
+  }
+}
+
+Table sessions {
+  id String [pk]
+  sessionToken String [unique, not null]
+  userId Int [not null]
+  expires DateTime [not null]
+  user users [not null]
+}
+
+Table bugs {
+  id Int [pk, increment]
+  title String [not null]
+  description String
+  reporter_id Int [not null]
+  developer_id Int [not null]
+  project_id Int [not null]
+  status BugStatus [not null, default: 'NEW']
+  priorty BugPriority [not null, default: 'LOW']
+  created_at DateTime [default: `now()`, not null]
+  updated_at DateTime [not null]
+  reporter users [not null]
+  developer users
+  project projects [not null]
+  Comments comments [not null]
+}
+
+Table projects {
+  id Int [pk, increment]
+  name String [not null]
+  description String
+  slug String [unique, not null]
+  owner_id Int [not null]
+  owner users [not null]
+  bugs bugs [not null]
+  ProjectMembership member_project [not null]
+}
+
+Table comments {
+  id Int [pk, increment]
+  body String [not null]
+  user_id Int [not null]
+  bug_id Int [not null]
+  user users [not null]
+  bug bugs [not null]
+}
+
+Enum BugStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+Enum BugPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+Enum ProjectRole {
+  REPORTER
+  DEVELOPER
+  MANAGER
+}
+
+Ref: member_project.user_id > users.id
+
+Ref: member_project.project_id > projects.id
+
+Ref: accounts.userId > users.id [delete: Cascade]
+
+Ref: sessions.userId > users.id [delete: Cascade]
+
+Ref: bugs.reporter_id > users.id
+
+Ref: bugs.developer_id > users.id
+
+Ref: bugs.project_id > projects.id
+
+Ref: projects.owner_id > users.id
+
+Ref: comments.user_id > users.id
+
+Ref: comments.bug_id > bugs.id
