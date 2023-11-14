@@ -4,13 +4,15 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 generator dbml {
   provider = "prisma-dbml-generator"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_LOCAL_URL")
+  // directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 enum BugStatus {
@@ -101,20 +103,23 @@ model Session {
 }
 
 model Bug {
-  id           Int         @id @default(autoincrement())
-  title        String
-  description  String?
-  reporter_id  Int
-  developer_id Int
-  project_id   Int
-  status       BugStatus   @default(NEW)
-  priorty      BugPriority @default(LOW)
-  created_at   DateTime    @default(now())
-  updated_at   DateTime    @updatedAt
-  reporter     User        @relation("BugReporter", fields: [reporter_id], references: [id])
-  developer    User?       @relation("BugDeveloper", fields: [developer_id], references: [id])
-  project      Project     @relation(fields: [project_id], references: [id])
-  Comments     Comments[]
+  id              Int         @id @default(autoincrement())
+  title           String
+  description     String?
+  reporter_id     Int
+  developer_id    Int
+  project_id      Int
+  order_in_column Int
+  status          BugStatus   @default(NEW)
+  priorty         BugPriority @default(LOW)
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+  reporter        User        @relation("BugReporter", fields: [reporter_id], references: [id])
+  developer       User?       @relation("BugDeveloper", fields: [developer_id], references: [id])
+  project         Project     @relation(fields: [project_id], references: [id])
+  comments        Comments[]
+  column          Column?     @relation(fields: [column_id], references: [id])
+  column_id       Int?
 
   @@map("bugs")
 }
@@ -123,11 +128,12 @@ model Project {
   id                Int                 @id @default(autoincrement())
   name              String
   description       String?
-  slug              String @unique
+  slug              String              @unique
   owner_id          Int
   owner             User                @relation(fields: [owner_id], references: [id])
   bugs              Bug[]
-  ProjectMembership ProjectMembership[]
+  projectMembership ProjectMembership[]
+  column            Column[]
 
   @@map("projects")
 }
@@ -141,4 +147,15 @@ model Comments {
   bug     Bug    @relation(fields: [bug_id], references: [id])
 
   @@map("comments")
+}
+
+model BoardColumn {
+  id         Int     @id @default(autoincrement())
+  name       String
+  project_id Int
+  project    Project @relation(fields: [project_id], references: [id])
+  bugs       Bug[]
+  order      Int     @default(1)
+
+  @@map("project_columns")
 }

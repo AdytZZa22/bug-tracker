@@ -1,12 +1,10 @@
-import Sidebar from "@/components/Sidebar";
 import AddProject from "@/components/AddProject";
 import Image from "next/image"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { BsFillBarChartFill } from "react-icons/bs";
-import { createProject, getUserProjects } from "@/modules/project/project.service";
-import { ProjectDTO } from "@/modules/project/project.schema";
+import { getUserProjects } from "@/modules/project/project.service";
 
 
 
@@ -22,8 +20,7 @@ export default async function Home() {
 
 
   return (
-    <main className="flex min-h-screen">
-        <Sidebar projects={userProjects} />
+    <>
         {/* Main content */}
         <div className="flex-1 px-4 pt-4">
             <h2 className="text-3xl font-bold tracking-tight">Projects</h2>
@@ -69,6 +66,6 @@ export default async function Home() {
                 })}
             </div>
         </div>
-    </main>
+    </>
   )
 }

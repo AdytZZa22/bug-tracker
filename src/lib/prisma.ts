@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import {PrismaClient} from '@prisma/client';
+
 interface Observer {
     [operation: string]: (args: any) => Promise<void> | void;
 }
@@ -28,7 +29,9 @@ if (process.env.NODE_ENV === "production") {
         prisma: PrismaClient;
     };
     if (!globalWithPrisma.prisma) {
-        globalWithPrisma.prisma = new PrismaClient().$extends({
+        const prisma = new PrismaClient() as unknown as PrismaClient;
+
+        globalWithPrisma.prisma = prisma.$extends({
             query: {
                 async $allOperations({model, operation, args, query}) {
 
@@ -36,19 +39,20 @@ if (process.env.NODE_ENV === "production") {
                     const result = await query(args);
 
                     try {
-                        const observer = await getObserverInstance(observerClassName)
-    
-                        const observerOperation: string = `${operation}d`
-    
+                        const observer = await getObserverInstance(observerClassName);
+
+                        const observerOperation: string = `${operation}d`;
+
                         if (typeof observer[observerOperation] === 'function') {
-                            await observer[observerOperation](result );
+                            await observer[observerOperation](result);
                         }
 
-                    } catch {}
+                    } catch {
+                    }
                     return result;
                 }
             }
-        }) as PrismaClient;
+        }) as unknown as PrismaClient;
     }
     prisma = globalWithPrisma.prisma;
 }

@@ -68,6 +68,7 @@ Table bugs {
   reporter_id Int [not null]
   developer_id Int [not null]
   project_id Int [not null]
+  order_in_column Int [not null]
   status BugStatus [not null, default: 'NEW']
   priorty BugPriority [not null, default: 'LOW']
   created_at DateTime [default: `now()`, not null]
@@ -75,7 +76,9 @@ Table bugs {
   reporter users [not null]
   developer users
   project projects [not null]
-  Comments comments [not null]
+  comments comments [not null]
+  column project_columns
+  column_id Int
 }
 
 Table projects {
@@ -86,7 +89,8 @@ Table projects {
   owner_id Int [not null]
   owner users [not null]
   bugs bugs [not null]
-  ProjectMembership member_project [not null]
+  projectMembership member_project [not null]
+  column project_columns [not null]
 }
 
 Table comments {
@@ -96,6 +100,15 @@ Table comments {
   bug_id Int [not null]
   user users [not null]
   bug bugs [not null]
+}
+
+Table project_columns {
+  id Int [pk, increment]
+  name String [not null]
+  project_id Int [not null]
+  project projects [not null]
+  bugs bugs [not null]
+  order Int [not null, default: 1]
 }
 
 Enum BugStatus {
@@ -132,8 +145,12 @@ Ref: bugs.developer_id > users.id
 
 Ref: bugs.project_id > projects.id
 
+Ref: bugs.column_id > project_columns.id
+
 Ref: projects.owner_id > users.id
 
 Ref: comments.user_id > users.id
 
 Ref: comments.bug_id > bugs.id
+
+Ref: project_columns.project_id > projects.id

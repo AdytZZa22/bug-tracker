@@ -45,11 +45,10 @@ export default function AddProject() {
     const { watch, setValue } = form;
 
     const name = watch('name')
-    const slug = watch('slug')
 
     useEffect(() => {
         setValue('slug', slugify(name, { lower: true}))
-    }, [name])
+    }, [name, setValue])
 
     async function createProject(values: CreateProjectSchema) {
 
@@ -146,7 +145,7 @@ export default function AddProject() {
                                         <Textarea placeholder="Description" {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                        Just a little description about what's happening behind the walls
+                                        Just a little description about what is happening behind the walls
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

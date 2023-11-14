@@ -14,31 +14,34 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import {Badge} from "@/components/ui/badge";
+import {SidebarItem} from "@/components/ui/sidebar-item";
+import Link from "next/link";
+import {Project} from "@prisma/client";
+import {usePathname} from "next/navigation";
 import {signOut} from "next-auth/react";
-import { Project } from "@prisma/client";
 
 
 
 export default function Sidebar({projects}: {projects: Project[]}) {
 
+    const pathname = usePathname();
 
 
-    return <div className="flex flex-col w-64 h-screen border-r-2 border-r-gray-200">
+
+    return <div className="flex flex-col w-64 border-r-2 border-r-gray-200">
         <div className="flex justify-center pb-6">
             <Image src="/logo.png" width="150" height="150" alt="" />
         </div>
 
         <div className="flex-grow">
 
-            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
-                <a href="#" className="flex items-center text-gray-400 border-r-4 border-r-black px-8">
-                    <HiOutlineViewGridAdd className="me-3" size={24} /><span className="text-[15px]">Overview</span>
-                </a>
-            </div>
+            <SidebarItem variant="default" href="/" active={pathname === "/"}>
+                <HiOutlineViewGridAdd className="me-3" size={24} /><span className="text-[15px]">Overview</span>
+            </SidebarItem>
 
-            <div className="flex flex-col hover:bg-gray-100 cursor-pointer">
-                <div className="text-gray-400 px-8">
-                    <Accordion type="single" collapsible>
+            <SidebarItem size="none" asLink={false} >
+                <div className="px-8">
+                    <Accordion type="single"  defaultValue="item-1" collapsible>
                         <AccordionItem value="item-1">
                             <AccordionTrigger className="hover:no-underline font-normal">
                                 <div className="flex items-center">
@@ -47,59 +50,47 @@ export default function Sidebar({projects}: {projects: Project[]}) {
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="min-w-full border-l-gray-200 border-l-2 ms-2">
-                                {projects.map(project => {
-                                    return <div key={project.id} className="flex gap-2 items-center p-2 ms-5 hover:bg-black hover:text-white">
+                                {projects?.map(project => {
+                                    return <Link href={`/project/${project.slug}`} key={project.id} className={`flex gap-2 items-center p-2 ms-5 hover:bg-black hover:text-white ${pathname.includes(project.slug) ? 'bg-black text-white' : ''}`}>
                                         <FiFile size={14}/>
                                         <span className="text-[12px]">{project.name}</span>
-                                    </div>
+                                    </Link>
                                 })}
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
                 </div>
+            </SidebarItem>
 
-            </div>
+            <SidebarItem>
+                <PiRocket className="me-3" size={24} /><span className="text-[15px]">Releases</span>
+            </SidebarItem>
 
-            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
-                <a href="#" className="flex items-center text-gray-400 border-r-black px-8">
-                    <PiRocket className="me-3" size={24} /><span className="text-[15px]">Releases</span>
-                </a>
-            </div>
+            <SidebarItem display="between">
+                <div className="flex items-center">
+                    <AiOutlineBug className="me-3" size={24} />
+                    <span className="text-[15px]">Reports</span>
+                </div>
+                <Badge variant="info">36</Badge>
+            </SidebarItem>
 
-            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
-                <a href="#" className="flex items-center justify-between text-gray-400 border-r-black px-8">
-                    <div className="flex items-center">
-                        <AiOutlineBug className="me-3" size={24} />
-                        <span className="text-[15px]">Reports</span>
-                    </div>
-                    <Badge variant="info">36</Badge>
-                </a>
-            </div>
+            <SidebarItem display="between">
+                 <div className="flex items-center">
+                     <BsChatDots className="me-3" size={24} />
+                     <span className="text-[15px]">Messages</span>
+                 </div>
+                <Badge variant="info">9+</Badge>
+            </SidebarItem>
 
-            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
-                <a href="#" className="flex items-center justify-between text-gray-400 border-r-black px-8">
-                     <div className="flex items-center">
-                         <BsChatDots className="me-3" size={24} />
-                         <span className="text-[15px]">Messages</span>
-                     </div>
-                    <Badge variant="info">9+</Badge>
-                </a>
-            </div>
-
-            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
-                <a href="#" className="flex items-center text-gray-400 border-r-black px-8">
+            <SidebarItem>
                     <IoSettingsOutline className="me-3" size={24} /><span className="text-[15px]">Reports</span>
-                </a>
-            </div>
+            </SidebarItem>
         </div>
 
-
         <div className="py-10">
-            <div className="flex flex-col py-4 hover:bg-gray-100 cursor-pointer">
-                    <p onClick={() => signOut()} className="flex items-center text-gray-400 border-r-black px-8">
-                        <PiSignOutBold className="me-3" size={24} /><span className="text-[15px]">Logout</span>
-                    </p>
-            </div>
+            <SidebarItem onClick={() => signOut()}>
+                <PiSignOutBold className="me-3" size={24} /><span className="text-[15px]">Logout</span>
+            </SidebarItem>
         </div>
     </div>
 }
