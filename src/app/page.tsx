@@ -5,18 +5,16 @@ import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { BsFillBarChartFill } from "react-icons/bs";
 import { getUserProjects } from "@/modules/project/project.service";
+import {generateSignedUrl} from "@/lib/helpers";
 
-
-
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
+// export const dynamic = "force-dynamic";
+// export const fetchCache = "force-no-store";
 
 export default async function Home() {
 
 
     const session = await getServerSession(authOptions);
     const userProjects = await getUserProjects(session?.user.id as number)
-
 
 
   return (

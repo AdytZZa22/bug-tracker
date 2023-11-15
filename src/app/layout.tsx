@@ -32,7 +32,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={poppins.className}>
+      <head>
+        <meta name="referrer" content="no-referrer" />
+      </head>
+      <body className={`${poppins.className}`}>
         <Toaster />
         <main className="flex">
           {session && <Sidebar projects={projects}/>}

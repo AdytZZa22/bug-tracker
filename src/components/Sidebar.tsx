@@ -28,7 +28,7 @@ export default function Sidebar({projects}: {projects: Project[]}) {
 
 
 
-    return <div className="flex flex-col w-64 border-r-2 border-r-gray-200">
+    return <div className="flex-none flex-shrink-0 h-screen w-64 border-r-2 border-r-gray-200">
         <div className="flex justify-center pb-6">
             <Image src="/logo.png" width="150" height="150" alt="" />
         </div>
@@ -62,29 +62,34 @@ export default function Sidebar({projects}: {projects: Project[]}) {
                 </div>
             </SidebarItem>
 
-            <SidebarItem>
-                <PiRocket className="me-3" size={24} /><span className="text-[15px]">Releases</span>
-            </SidebarItem>
 
-            <SidebarItem display="between">
-                <div className="flex items-center">
-                    <AiOutlineBug className="me-3" size={24} />
-                    <span className="text-[15px]">Reports</span>
-                </div>
-                <Badge variant="info">36</Badge>
-            </SidebarItem>
+            {pathname.includes("/project") && (
+                <>
+                    <SidebarItem>
+                        <PiRocket className="me-3" size={24} /><span className="text-[15px]">Releases</span>
+                    </SidebarItem>
 
-            <SidebarItem display="between">
-                 <div className="flex items-center">
-                     <BsChatDots className="me-3" size={24} />
-                     <span className="text-[15px]">Messages</span>
-                 </div>
-                <Badge variant="info">9+</Badge>
-            </SidebarItem>
+                    <SidebarItem display="between">
+                        <div className="flex items-center">
+                            <AiOutlineBug className="me-3" size={24} />
+                            <span className="text-[15px]">Reports</span>
+                        </div>
+                        <Badge variant="info">36</Badge>
+                    </SidebarItem>
 
-            <SidebarItem>
-                    <IoSettingsOutline className="me-3" size={24} /><span className="text-[15px]">Reports</span>
-            </SidebarItem>
+                    <SidebarItem display="between">
+                        <div className="flex items-center">
+                            <BsChatDots className="me-3" size={24} />
+                            <span className="text-[15px]">Messages</span>
+                        </div>
+                        <Badge variant="info">9+</Badge>
+                    </SidebarItem>
+
+                    <SidebarItem>
+                        <IoSettingsOutline className="me-3" size={24} /><span className="text-[15px]">Reports</span>
+                    </SidebarItem>
+                </>
+            )}
         </div>
 
         <div className="py-10">

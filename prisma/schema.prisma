@@ -33,15 +33,16 @@ enum ProjectRole {
   REPORTER
   DEVELOPER
   MANAGER
+  OWNER
 }
 
 model ProjectMembership {
   id         Int         @id @default(autoincrement())
   user_id    Int
   project_id Int
-  role       ProjectRole
+  role       ProjectRole @default(DEVELOPER)
   user       User        @relation(fields: [user_id], references: [id])
-  project    Project     @relation(fields: [project_id], references: [id])
+  project    Project     @relation(fields: [project_id], references: [id], onDelete: Cascade)
 
   @@map("member_project")
 }
@@ -103,22 +104,22 @@ model Session {
 }
 
 model Bug {
-  id              Int         @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   title           String
   description     String?
   reporter_id     Int
   developer_id    Int
   project_id      Int
   order_in_column Int
-  status          BugStatus   @default(NEW)
-  priorty         BugPriority @default(LOW)
-  created_at      DateTime    @default(now())
-  updated_at      DateTime    @updatedAt
-  reporter        User        @relation("BugReporter", fields: [reporter_id], references: [id])
-  developer       User?       @relation("BugDeveloper", fields: [developer_id], references: [id])
-  project         Project     @relation(fields: [project_id], references: [id])
+  status          BugStatus    @default(NEW)
+  priorty         BugPriority  @default(LOW)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+  reporter        User         @relation("BugReporter", fields: [reporter_id], references: [id])
+  developer       User?        @relation("BugDeveloper", fields: [developer_id], references: [id])
+  project         Project      @relation(fields: [project_id], references: [id], onDelete: Cascade)
   comments        Comments[]
-  column          Column?     @relation(fields: [column_id], references: [id])
+  column          BoardColumn? @relation(fields: [column_id], references: [id])
   column_id       Int?
 
   @@map("bugs")
@@ -133,7 +134,8 @@ model Project {
   owner             User                @relation(fields: [owner_id], references: [id])
   bugs              Bug[]
   projectMembership ProjectMembership[]
-  column            Column[]
+  column            BoardColumn[]
+  projectInvitation ProjectInvitation[]
 
   @@map("projects")
 }
@@ -153,9 +155,20 @@ model BoardColumn {
   id         Int     @id @default(autoincrement())
   name       String
   project_id Int
-  project    Project @relation(fields: [project_id], references: [id])
+  project    Project @relation(fields: [project_id], references: [id], onDelete: Cascade)
   bugs       Bug[]
   order      Int     @default(1)
 
   @@map("project_columns")
+}
+
+model ProjectInvitation {
+  id         Int      @id @default(autoincrement())
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  email      String   @db.VarChar(255)
+  url        String   @db.Text()
+  expiration DateTime @db.Timestamp()
+  project_id Int
+
+  @@map("project_invitations")
 }

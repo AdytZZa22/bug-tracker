@@ -6,7 +6,7 @@ Table member_project {
   id Int [pk, increment]
   user_id Int [not null]
   project_id Int [not null]
-  role ProjectRole [not null]
+  role ProjectRole [not null, default: 'DEVELOPER']
   user users [not null]
   project projects [not null]
 }
@@ -91,6 +91,7 @@ Table projects {
   bugs bugs [not null]
   projectMembership member_project [not null]
   column project_columns [not null]
+  projectInvitation project_invitations [not null]
 }
 
 Table comments {
@@ -111,6 +112,15 @@ Table project_columns {
   order Int [not null, default: 1]
 }
 
+Table project_invitations {
+  id Int [pk, increment]
+  project projects [not null]
+  email String [not null]
+  url String [not null]
+  expiration DateTime [not null]
+  project_id Int [not null]
+}
+
 Enum BugStatus {
   NEW
   IN_PROGRESS
@@ -129,11 +139,12 @@ Enum ProjectRole {
   REPORTER
   DEVELOPER
   MANAGER
+  OWNER
 }
 
 Ref: member_project.user_id > users.id
 
-Ref: member_project.project_id > projects.id
+Ref: member_project.project_id > projects.id [delete: Cascade]
 
 Ref: accounts.userId > users.id [delete: Cascade]
 
@@ -143,7 +154,7 @@ Ref: bugs.reporter_id > users.id
 
 Ref: bugs.developer_id > users.id
 
-Ref: bugs.project_id > projects.id
+Ref: bugs.project_id > projects.id [delete: Cascade]
 
 Ref: bugs.column_id > project_columns.id
 
@@ -153,4 +164,6 @@ Ref: comments.user_id > users.id
 
 Ref: comments.bug_id > bugs.id
 
-Ref: project_columns.project_id > projects.id
+Ref: project_columns.project_id > projects.id [delete: Cascade]
+
+Ref: project_invitations.project_id > projects.id [delete: Cascade]
