@@ -1,5 +1,6 @@
 import AddColumn from "@/components/project/AddColumn";
 import {
+    createBug,
     createColumn,
     createProjectInvitation,
     deleteColumn,
@@ -8,11 +9,15 @@ import {
 } from "@/modules/project/project.service";
 import {ClientColumnSchema, ColumnSchema} from "@/modules/project/column.schema";
 import {revalidatePath} from "next/cache";
-import BoardColumn from "@/components/project/BoardColumn";
+import KanbanColumn from "@/components/project/KanbanColumn";
 import {Avatar, AvatarImage} from "@/components/ui/avatar";
 
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip"
 import InviteUser from "@/components/project/InviteUser";
+import {ClientCreateBugSchema, CreateBugSchema, createBugSchema} from "@/modules/project/bug.schema";
+import {getServerSession, Session} from "next-auth";
+import {authOptions} from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 
 export default async function Dashboard({params}: {
@@ -20,6 +25,7 @@ export default async function Dashboard({params}: {
 }) {
 
     const project = await getProjectBySlug(params.slug)
+    const session = await getServerSession(authOptions) as Session
 
 
     async function handleCreateNewColumn(data: ClientColumnSchema) {
@@ -57,15 +63,35 @@ export default async function Dashboard({params}: {
     async function handleInviteUser(data: { email: string }) {
         "use server"
 
-        try {
-            return await createProjectInvitation(data.email, project?.slug as string);
-        } catch (e) {
-            console.log("test back-end")
+        return await createProjectInvitation(data.email, project?.slug as string);
 
-            throw e
+    }
+    async function handleCreateBug(data: ClientCreateBugSchema, columnId: number): Promise<void> {
+        "use server"
+
+        const columnExists = await prisma.boardColumn.findFirst({
+            where: {
+                id: columnId,
+                project_id: project?.id!
+            }
+        })
+        if(columnExists) {
+            const bugDTO: CreateBugSchema = {
+                project_id: project?.id!,
+                reporter_id: session.user.id!,
+                description: data.description!,
+                title: data.title,
+                developer_id: parseInt(data.developer_id),
+                priority: data.priority,
+                status: "NEW",
+                column_id: columnId,
+                order_in_column: 1
+
+            }
+            await createBug(bugDTO)
+
+            revalidatePath("/project/" + project?.slug)
         }
-
-
     }
     return (
         <div className="flex flex-col justify-center overflow-x-auto">
@@ -94,10 +120,13 @@ export default async function Dashboard({params}: {
 
             <div className="flex items-center px-4 space-x-4">
                 {project?.column.map((column) => (
-                    <BoardColumn
+
+                    <KanbanColumn
                         key={column.id}
+                        members={project.projectMembership}
                         deleteColumn={handleDeleteColumn}
                         editColumnName={handleEditColumn}
+                        createBug={handleCreateBug}
                         column={column}
                     />
                 ))}

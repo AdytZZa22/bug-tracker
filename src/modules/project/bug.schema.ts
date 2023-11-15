@@ -15,9 +15,10 @@ export const createBugSchema = z.object({
 
 export const clientCreateBugSchema = createBugSchema
     .extend({
-        description: z.string().min(5).optional()
+        description: z.string().min(5).optional(),
+        developer_id: z.string(),
     })
-    .omit({ reporter_id: true });
+    .omit({ reporter_id: true, project_id: true, order_in_column: true, column_id: true, status: true });
 
 
 

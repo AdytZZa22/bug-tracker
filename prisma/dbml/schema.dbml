@@ -70,7 +70,7 @@ Table bugs {
   project_id Int [not null]
   order_in_column Int [not null]
   status BugStatus [not null, default: 'NEW']
-  priorty BugPriority [not null, default: 'LOW']
+  priority BugPriority [not null, default: 'LOW']
   created_at DateTime [default: `now()`, not null]
   updated_at DateTime [not null]
   reporter users [not null]

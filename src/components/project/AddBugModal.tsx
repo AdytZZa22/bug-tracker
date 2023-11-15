@@ -17,10 +17,25 @@ import {
   } from "@/components/ui/sheet";
 
 import { Editor } from "novel";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {IMember} from "@/types";
+import Image from "next/image";
+import {BugPriority} from "@prisma/client";
 interface Props {
-    children: ReactNode | string
+    children: ReactNode | string,
+    members: IMember[]
+    handleOnSubmit: (data: ClientCreateBugSchema) => Promise<void>
 }
-export default function AddBugModal({ children }: Props) {
+
+
+export default function AddBugModal({ children, members, handleOnSubmit }: Props) {
 
     const form = useForm<ClientCreateBugSchema>({
         resolver: zodResolver(clientCreateBugSchema),
@@ -29,14 +44,17 @@ export default function AddBugModal({ children }: Props) {
             description: "",
         }
     })
+
+
+
+
     return (
         <Sheet>
             <SheetTrigger>
                 <Button asChild className="flex w-full">
                     <div>
-                    {typeof children === "string" && <BsPlusCircle className="mx-2" />}
-                    {children}
-
+                        {typeof children === "string" && <BsPlusCircle className="mx-2" />}
+                        {children}
                     </div>
                 </Button>
             </SheetTrigger>
@@ -44,9 +62,9 @@ export default function AddBugModal({ children }: Props) {
                 <SheetHeader>
                     <SheetTitle>Create new bug</SheetTitle>
                 </SheetHeader>
-                
+
                 <Form {...form}>
-                    <form className="space-y-8">
+                    <form onSubmit={form.handleSubmit(handleOnSubmit)} className="space-y-8">
                         <FormField
                             control={form.control}
                             name="title"
@@ -62,20 +80,76 @@ export default function AddBugModal({ children }: Props) {
                         />
                         <FormField
                             control={form.control}
+                            name="developer_id"
+                            render={({field}) => (
+                                <FormItem>
+                                    <Select onValueChange={field.onChange}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select a partner" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {members.map((member) => {
+                                                    return <SelectItem key={member.id} value={member.user_id.toString()}>
+                                                        <div className="flex items-center space-x-2">
+                                                            <Image
+                                                                className="rounded-full"
+                                                                src={member.user.image as string}
+                                                                alt={member.user.name as string}
+                                                                width={24}
+                                                                height={24}
+                                                            />
+                                                            <span>{member.user.name}</span>
+                                                        </div>
+                                                    </SelectItem>
+                                                })}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="priority"
+                            render={({field}) => (
+                                <FormItem>
+                                    <Select onValueChange={field.onChange}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select the priority" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {(Object.keys(BugPriority) as Array<keyof typeof BugPriority>).map((key, index) => {
+                                                    return <SelectItem key={index} value={key}>{key}</SelectItem>
+                                                })}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
                             name="description"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Description</FormLabel>
-                                    <Editor className="" disableLocalStorage={true} onUpdate={field.onChange} />
+                                    <Editor defaultValue="" className="" disableLocalStorage={true} onUpdate={(editor) => form.setValue("description", editor?.getHTML())} />
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
+                        <Button className="flex w-full cursor-pointer mt-2">
+                           Create
+                        </Button>
                     </form>
                 </Form>
                 <SheetFooter>
-                    <Button asChild className="flex w-full cursor-pointer mt-2">
-                        <div>Create</div>
-                    </Button>
+
                 </SheetFooter>
             </SheetContent>
         </Sheet>

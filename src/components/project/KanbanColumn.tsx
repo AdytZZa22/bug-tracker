@@ -2,7 +2,7 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {PiDotsThreeCircleLight} from "react-icons/pi";
 import {Separator} from "@/components/ui/separator";
-import {Column} from "@prisma/client";
+import {BoardColumn, Bug} from "@prisma/client";
 import BugSection from "@/components/project/BugSection";
 import AddBugModal from "@/components/project/AddBugModal";
 import {
@@ -16,18 +16,29 @@ import {useToast} from "@/components/ui/use-toast";
 import {useState} from "react";
 import EditColumn from "@/components/project/EditColumn";
 import {ClientColumnSchema} from "@/modules/project/column.schema";
+import {IMember} from "@/types";
+import {ClientCreateBugSchema} from "@/modules/project/bug.schema";
+
 
 
 interface Props {
-    column: Column
+    members:  IMember[]
+    column: BoardColumn & {
+        bugs: Bug[]
+    }
     deleteColumn: (columnId: number) => Promise<void>
     editColumnName: (columnId: number, name: string) => Promise<void>
-
+    createBug: (data: ClientCreateBugSchema, columnId: number) => Promise<void>
 }
-export default function BoardColumn({column, deleteColumn, editColumnName}: Props) {
+export default function KanbanColumn({column, deleteColumn, editColumnName, createBug, members}: Props) {
 
     const [open, setOpen] = useState<boolean>(false)
     const { toast } = useToast()
+
+
+    async function handleOnSubmit(data: ClientCreateBugSchema) {
+        await createBug(data, column.id)
+    }
 
 
     async function handleOnEditColumn(data: ClientColumnSchema) {
@@ -73,7 +84,7 @@ export default function BoardColumn({column, deleteColumn, editColumnName}: Prop
                         <CardTitle className="text-2xl">
                             {column.name}
                         </CardTitle>
-                        <CardDescription>0 tasks available</CardDescription>
+                        <CardDescription>{column.bugs.length} tasks available</CardDescription>
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -95,12 +106,14 @@ export default function BoardColumn({column, deleteColumn, editColumnName}: Prop
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <AddBugModal>add new</AddBugModal>
+                <AddBugModal handleOnSubmit={handleOnSubmit} members={members}>add new</AddBugModal>
             </CardHeader>
             <CardContent>
                 <Separator className="mb-2" />
 
-                <BugSection />
+                {column.bugs.map((bug) => {
+                    return <BugSection key={bug.id} bug={bug} />
+                })}
 
                 <Separator className="my-4" />
             </CardContent>

@@ -11,7 +11,8 @@ const nextConfig = {
           "www.google.com",
           "flag.vercel.app",
           "illustrations.popsy.co",
-          "app.vercel.pub"
+          "app.vercel.pub",
+          "lh3.googleusercontent.com"
         ],
       
       },

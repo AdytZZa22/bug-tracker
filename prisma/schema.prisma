@@ -112,7 +112,7 @@ model Bug {
   project_id      Int
   order_in_column Int
   status          BugStatus    @default(NEW)
-  priorty         BugPriority  @default(LOW)
+  priority        BugPriority  @default(LOW)
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
   reporter        User         @relation("BugReporter", fields: [reporter_id], references: [id])

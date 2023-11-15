@@ -8,6 +8,7 @@ import {generateSignedUrl} from "@/lib/helpers";
 import {Resend} from "resend";
 import ProjectInvitationTemplate from "@/components/email-templates/project-invitation-template";
 import {Project, User} from "@prisma/client";
+import {CreateBugSchema} from "@/modules/project/bug.schema";
 
 export async function createProject(projectDTO: ProjectDTO) {
     const project = prisma.project.create({
@@ -19,9 +20,11 @@ export async function createProject(projectDTO: ProjectDTO) {
     return project;
 }
 
-export async function createBug()
+export async function createBug(bugDTO: CreateBugSchema)
 {
-    
+    return prisma.bug.create({
+        data: bugDTO
+    })
 }
 
 export async function inviteUser(user: User, project: Project) {
@@ -157,6 +160,9 @@ export async function getProjectBySlug(slug: string) {
             column: {
                 orderBy: {
                     order: 'asc'
+                },
+                include: {
+                    bugs: true
                 }
             },
             projectMembership: {

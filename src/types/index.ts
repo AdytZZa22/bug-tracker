@@ -1,3 +1,5 @@
+import {ProjectRole} from "@prisma/client";
+
 export type Id = string | number;
 
 export type Column = {
@@ -10,3 +12,13 @@ export type Task = {
     columnId: Id;
     content: string;
 };
+
+export interface IMember {
+    user: {
+        name: string | null, image: string | null
+    }
+    id: number,
+    user_id: number,
+    project_id: number,
+    role: ProjectRole
+}
