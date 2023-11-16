@@ -112,7 +112,7 @@ export async function createProjectInvitation(userEmail: string, projectSlug: st
     } else {
         await resend.emails.send({
             from: 'Acme <onboarding@resend.dev>',
-            to: ['delivered@resend.dev'],
+            to: [userEmail],
             subject: 'Project invitation',
             react: InviteMagicLinkEmail({url: url}),
         });

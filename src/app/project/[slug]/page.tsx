@@ -1,4 +1,3 @@
-import AddColumn from "@/components/project/AddColumn";
 import {
     createBug,
     createColumn,
@@ -9,7 +8,6 @@ import {
 } from "@/modules/project/project.service";
 import {ClientColumnSchema, ColumnSchema} from "@/modules/project/column.schema";
 import {revalidatePath} from "next/cache";
-import KanbanColumn from "@/components/project/KanbanColumn";
 import {Avatar, AvatarImage} from "@/components/ui/avatar";
 
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip"
@@ -21,10 +19,7 @@ import prisma from "@/lib/prisma";
 import KanbanBoard from "@/components/project/KanbanBoard";
 import {BoardColumn, Bug} from "@prisma/client";
 import React, {Suspense} from "react";
-import {Skeleton} from "@/components/ui/skeleton";
-import {Separator} from "@/components/ui/separator";
 import LoadingBoard from "@/components/LoadingBoard";
-import {FaUserPlus} from "react-icons/fa";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";

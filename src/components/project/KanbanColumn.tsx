@@ -13,7 +13,7 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {useToast} from "@/components/ui/use-toast";
-import {startTransition, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import EditColumn from "@/components/project/EditColumn";
 import {ClientColumnSchema} from "@/modules/project/column.schema";
 import {IBug, IMember} from "@/types";

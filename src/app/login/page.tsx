@@ -1,11 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import {buttonVariants} from "@/components/ui/button";
-import {cn} from "@/lib/utils";
 import {UserAuthForm} from "@/components/UserAuthForm";
-import {getServerSession} from "next-auth";
-import {redirect} from "next/navigation";
-import {authOptions} from "@/lib/auth";
+import {Metadata} from "next";
+
+
+export const metadata: Metadata = {
+    title: 'Bug tracker - Login',
+    description: 'Bug tracker application',
+}
 export default async function Login() {
 
    

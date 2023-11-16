@@ -1,7 +1,6 @@
 "use client"
 import {
     closestCenter,
-    closestCorners,
     DndContext,
     DragEndEvent,
     DragOverEvent,
