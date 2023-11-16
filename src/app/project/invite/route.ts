@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
         const project = await getProjectBySlug(data.project_slug)
         const user = await getUserByEmail(data.email)
-        if(!project || !user) redirect("/")
+        if(!project || !user) return NextResponse.redirect(new URL(`/login`, request.url))
 
 
         await prisma.projectInvitation.deleteMany({
