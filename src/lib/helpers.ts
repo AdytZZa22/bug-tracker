@@ -48,9 +48,11 @@ export async function validateSignedUrl<TData extends ParsedUrlQueryInput>(url: 
     params.delete("exp")
 
     const serializedData = queryString.stringify(Object.fromEntries(params));
+
+    console.log(serializedData)
     const expectedSignature = crypto.createHmac('sha256', secret).update(`${serializedData}:${expirationTime}`).digest('hex');
 
-    console.log("SECRET USED TO HASH " + secret)
+    console.log("SECRET USED TO DEHASH " + secret)
     console.log("Signature in the URL " + signature)
     console.log("Expected signature: " + expectedSignature)
 
