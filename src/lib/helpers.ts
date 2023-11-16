@@ -21,6 +21,8 @@ export async function generateSignedUrl<TData extends ParsedUrlQueryInput>(data:
 
     const signature = crypto.createHmac('sha256', secret).update(`${serializedData}:${expirationTime}`).digest('hex')
 
+    console.log("SECRET USED TO HASH " + secret)
+
     return `${baseURL}/${route}?${serializedData}&exp=${expirationTime}&signature=${signature}`
 }
 
@@ -47,6 +49,10 @@ export async function validateSignedUrl<TData extends ParsedUrlQueryInput>(url: 
 
     const serializedData = queryString.stringify(Object.fromEntries(params));
     const expectedSignature = crypto.createHmac('sha256', secret).update(`${serializedData}:${expirationTime}`).digest('hex');
+
+    console.log("SECRET USED TO HASH " + secret)
+    console.log("Signature in the URL " + signature)
+    console.log("Expected signature: " + expectedSignature)
 
     if (signature !== expectedSignature) {
         throw new Error("Invalid signature");
