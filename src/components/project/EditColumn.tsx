@@ -11,7 +11,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 
 interface Props {
     open: boolean
-    setOpen: any
+    setOpen: (state: boolean) => void
     handleOnEditColumn: (data: ClientColumnSchema) => Promise<void>
     defaultName: string
 }

@@ -18,7 +18,7 @@ import {createPortal} from "react-dom";
 import TaskCard from "@/components/TaskCard";
 
 
-export default function KanbanBoard() {
+export default function LegacyKanbanBoard() {
 
     const defaultCols: Column[] = [
         {

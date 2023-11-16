@@ -90,7 +90,7 @@ Table projects {
   owner users [not null]
   bugs bugs [not null]
   projectMembership member_project [not null]
-  column project_columns [not null]
+  columns project_columns [not null]
   projectInvitation project_invitations [not null]
 }
 

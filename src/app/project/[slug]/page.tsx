@@ -4,7 +4,7 @@ import {
     createColumn,
     createProjectInvitation,
     deleteColumn,
-    editColumnName,
+    editColumnName, getProjectBugsBySlug,
     getProjectBySlug
 } from "@/modules/project/project.service";
 import {ClientColumnSchema, ColumnSchema} from "@/modules/project/column.schema";
@@ -14,10 +14,12 @@ import {Avatar, AvatarImage} from "@/components/ui/avatar";
 
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip"
 import InviteUser from "@/components/project/InviteUser";
-import {ClientCreateBugSchema, CreateBugSchema, createBugSchema} from "@/modules/project/bug.schema";
+import {ClientCreateBugSchema, CreateBugSchema} from "@/modules/project/bug.schema";
 import {getServerSession, Session} from "next-auth";
 import {authOptions} from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import KanbanBoard from "@/components/project/KanbanBoard";
+import {BoardColumn, Bug} from "@prisma/client";
 
 
 export default async function Dashboard({params}: {
@@ -25,6 +27,7 @@ export default async function Dashboard({params}: {
 }) {
 
     const project = await getProjectBySlug(params.slug)
+    const bugs = await getProjectBugsBySlug(params.slug)
     const session = await getServerSession(authOptions) as Session
 
 
@@ -93,46 +96,43 @@ export default async function Dashboard({params}: {
             revalidatePath("/project/" + project?.slug)
         }
     }
+
+    async function handleUpdateColumnOrder(columns: BoardColumn[]) {
+        "use server"
+
+        for (let i = 0; i < columns.length; i++) {
+            const column = columns[i];
+            await prisma.boardColumn.update({
+                where: {
+                    id: column.id,
+                    project_id: project?.id
+                },
+                data: { order: i + 1 }
+            });
+        }
+    }
+    async function handleUpdateBugsOrder(bugs: Bug[]) {
+        "use server"
+
+        for(let i = 0; i < bugs.length; i++) {
+            const bug = bugs[i];
+            await prisma.bug.update({
+                where: {
+                    id: bug.id,
+                    project_id: project?.id!
+                },
+                data: {
+                    order_in_column: i + 1,
+                    column_id: bug.column_id
+                }
+            })
+        }
+    }
     return (
-        <div className="flex flex-col justify-center overflow-x-auto">
-            <div className="flex space-x-4 p-4">
+       <KanbanBoard handleUpdateBugsOrder={handleUpdateBugsOrder} handleUpdateColumnOrder={handleUpdateColumnOrder} defaultCols={project?.columns!} defaultBugs={bugs!} handleDeleteColumn={handleDeleteColumn} handleEditColumn={handleEditColumn} handleCreateBug={handleCreateBug} members={project?.projectMembership!} />
 
-                {project?.projectMembership.map(function (member) {
-                    return (
-                        <TooltipProvider key={member.id} delayDuration={100}>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Avatar title={member.user.name as string}>
-                                        <AvatarImage src={member.user.image as string} alt={member.user.name as string} />
-                                    </Avatar>
-                                </TooltipTrigger>
-                                <TooltipContent side="top">
-                                    <p>{member.user.name}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    )
-                })}
-
-
-                <InviteUser handleInviteUser={handleInviteUser} />
-            </div>
-
-            <div className="flex items-center px-4 space-x-4">
-                {project?.column.map((column) => (
-
-                    <KanbanColumn
-                        key={column.id}
-                        members={project.projectMembership}
-                        deleteColumn={handleDeleteColumn}
-                        editColumnName={handleEditColumn}
-                        createBug={handleCreateBug}
-                        column={column}
-                    />
-                ))}
-                <AddColumn createNewColumn={handleCreateNewColumn} />
-                {/*<KanbanBoard />*/}
-            </div>
-        </div>
+    // <div className="flex flex-col w-auto">
+    //     <AddColumn createNewColumn={handleCreateNewColumn} />
+    // </div>
     );
 }

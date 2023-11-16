@@ -31,11 +31,13 @@ import {BugPriority} from "@prisma/client";
 interface Props {
     children: ReactNode | string,
     members: IMember[]
-    handleOnSubmit: (data: ClientCreateBugSchema) => Promise<void>
+    handleCreateBug: (data: ClientCreateBugSchema) => Promise<void>
+    open: boolean
+    setOpen: (state: boolean) => void
 }
 
 
-export default function AddBugModal({ children, members, handleOnSubmit }: Props) {
+export default function AddBugModal({ children, members, open, setOpen, handleCreateBug }: Props) {
 
     const form = useForm<ClientCreateBugSchema>({
         resolver: zodResolver(clientCreateBugSchema),
@@ -47,9 +49,8 @@ export default function AddBugModal({ children, members, handleOnSubmit }: Props
 
 
 
-
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger>
                 <Button asChild className="flex w-full">
                     <div>
@@ -64,7 +65,7 @@ export default function AddBugModal({ children, members, handleOnSubmit }: Props
                 </SheetHeader>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleOnSubmit)} className="space-y-8">
+                    <form onSubmit={form.handleSubmit(handleCreateBug)} className="space-y-8">
                         <FormField
                             control={form.control}
                             name="title"

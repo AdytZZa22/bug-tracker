@@ -1,14 +1,14 @@
 "use server";
-import {compareAsc, isBefore} from 'date-fns';
+import {isBefore} from 'date-fns';
 import prisma from '@/lib/prisma';
 import {ProjectDTO} from './project.schema';
 import {revalidatePath} from "next/cache";
-import {ColumnSchema} from "@/modules/project/column.schema";
+import {columnSchema, ColumnSchema} from "@/modules/project/column.schema";
 import {generateSignedUrl} from "@/lib/helpers";
 import {Resend} from "resend";
 import ProjectInvitationTemplate from "@/components/email-templates/project-invitation-template";
 import {Project, User} from "@prisma/client";
-import {CreateBugSchema} from "@/modules/project/bug.schema";
+import {createBugSchema, CreateBugSchema} from "@/modules/project/bug.schema";
 
 export async function createProject(projectDTO: ProjectDTO) {
     const project = prisma.project.create({
@@ -22,6 +22,21 @@ export async function createProject(projectDTO: ProjectDTO) {
 
 export async function createBug(bugDTO: CreateBugSchema)
 {
+
+
+    const result = createBugSchema.safeParse(bugDTO);
+
+    if(!result.success) {
+        throw result.error
+    }
+    const userInProject = await prisma.projectMembership.findFirst({
+        where: {
+            user_id: bugDTO.developer_id,
+            project_id: bugDTO.project_id
+        }
+    })
+
+    if(!userInProject) throw new Error("The person is not in your project")
     return prisma.bug.create({
         data: bugDTO
     })
@@ -104,6 +119,7 @@ export async function createProjectInvitation(userEmail: string, projectSlug: st
             }
         })
     }
+    // TODO: Send email with link
 
     return {
         success: true,
@@ -132,6 +148,9 @@ export async function editColumnName(name: string, columnId: number, projectId: 
 }
 
 export async function createColumn(columnDTO: ColumnSchema) {
+    const result = columnSchema.safeParse(columnDTO)
+
+    if(!result.success) throw result.error
     return prisma.boardColumn.create({
         data: columnDTO
     })
@@ -151,19 +170,28 @@ export async function getProjectMembers(projectId: number) {
     });
 }
 
+
+export async function getProjectBugsBySlug(slug: string) {
+    return prisma.project.findFirst({
+        where: {
+            slug: slug
+        },
+    }).bugs({
+        orderBy: {
+            order_in_column: 'asc'
+        }
+    })
+}
 export async function getProjectBySlug(slug: string) {
     return prisma.project.findFirst({
         where: {
             slug: slug
         },
         include: {
-            column: {
+            columns: {
                 orderBy: {
                     order: 'asc'
                 },
-                include: {
-                    bugs: true
-                }
             },
             projectMembership: {
                 include: {
