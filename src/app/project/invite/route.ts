@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
         const session = await getServerSession(authOptions)
 
-        if(!session?.user) redirect('/login');
+        if(!session?.user) return NextResponse.redirect(new URL(`/login`, request.url))
 
 
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
         const invitation = await inviteUser(user, project)
 
-        if(!invitation) redirect("/")
+        if(!invitation) return NextResponse.redirect(new URL(`/`, request.url))
 
         console.log(project.slug)
 
