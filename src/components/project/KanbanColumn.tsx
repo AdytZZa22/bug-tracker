@@ -13,13 +13,14 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {useToast} from "@/components/ui/use-toast";
-import {useMemo, useState} from "react";
+import {startTransition, useMemo, useState} from "react";
 import EditColumn from "@/components/project/EditColumn";
 import {ClientColumnSchema} from "@/modules/project/column.schema";
-import {IMember} from "@/types";
+import {IBug, IMember} from "@/types";
 import {ClientCreateBugSchema} from "@/modules/project/bug.schema";
 import {SortableContext, useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
+import {useRouter} from "next/navigation";
 
 
 
@@ -36,6 +37,8 @@ export default function KanbanColumn({column, bugs, deleteColumn, editColumnName
     const [open, setOpen] = useState<boolean>(false)
     const [sheetOpen, setSheetOpen] = useState<boolean>(false)
     const { toast } = useToast()
+
+    const router = useRouter()
 
 
     const bugsIds = useMemo(() => {
@@ -86,6 +89,7 @@ export default function KanbanColumn({column, bugs, deleteColumn, editColumnName
 
         try {
             await editColumnName(column.id, data.name)
+
 
             toast({
                 title: "✅ Success",
@@ -180,19 +184,10 @@ export default function KanbanColumn({column, bugs, deleteColumn, editColumnName
                 <Separator className="mb-2" />
                 <SortableContext items={bugsIds}>
                     {bugs.map((bug) => {
-                        return <BugSection key={bug.id} bug={bug} />
+                        return <BugSection key={bug.id} bug={bug as IBug} />
                     })}
                 </SortableContext>
             </CardContent>
-            {/*<CardFooter className="flex justify-between">*/}
-            {/*    <div className="space-x-2">*/}
-            {/*        <span className="text-blue-400">#DEVELOPING</span>*/}
-            {/*        <span className="text-pink-400">#DESIGN</span>*/}
-            {/*    </div>*/}
-            {/*    <div className="flex items-center text-gray-400">*/}
-            {/*        <BsFillChatLeftFill className="mx-2" /><span>16</span>*/}
-            {/*    </div>*/}
-            {/*</CardFooter>*/}
 
             <EditColumn defaultName={column.name} open={open} setOpen={setOpen} handleOnEditColumn={handleOnEditColumn} />
         </Card>

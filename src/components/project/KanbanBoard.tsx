@@ -1,6 +1,7 @@
 "use client"
 import {
     closestCenter,
+    closestCorners,
     DndContext,
     DragEndEvent,
     DragOverEvent,
@@ -16,7 +17,7 @@ import {BoardColumn, Bug} from "@prisma/client";
 import KanbanColumn from "@/components/project/KanbanColumn";
 import {ClientCreateBugSchema} from "@/modules/project/bug.schema";
 import React, {useEffect, useMemo, useState} from "react";
-import {IMember} from "@/types";
+import {IBug, IMember} from "@/types";
 import {createPortal} from "react-dom";
 import BugSection from "@/components/project/BugSection";
 
@@ -34,8 +35,8 @@ interface Props {
 
 export default function KanbanBoard({defaultCols, defaultBugs, members, handleEditColumn, handleUpdateColumnOrder, handleDeleteColumn, handleCreateBug, handleUpdateBugsOrder}: Props) {
 
-    const [columns, setColumns] = useState<ExtendedBoardColumn[]>(defaultCols);
-    const [bugs, setBugs] = useState<Bug[]>(defaultBugs);
+    const [columns, setColumns] = useState<ExtendedBoardColumn[]>([]);
+    const [bugs, setBugs] = useState<Bug[]>([]);
 
 
     const [activeColumn, setActiveColumn] = useState<ExtendedBoardColumn | null>(null);
@@ -51,6 +52,14 @@ export default function KanbanBoard({defaultCols, defaultBugs, members, handleEd
     )
     const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
+
+    useEffect(() => {
+        setColumns(defaultCols)
+    }, [defaultCols]);
+
+    useEffect(() => {
+        setBugs(defaultBugs)
+    }, [defaultBugs]);
 
     useEffect(() => {
         if(columns) {
@@ -145,7 +154,7 @@ export default function KanbanBoard({defaultCols, defaultBugs, members, handleEd
     }
 
     return (
-        <div className="flex-1 flex min-h-screen m-auto items-center w-full overflow-x-auto overflow-y-hidden px-[40px]">
+
             <DndContext
                 id={"board"}
                 sensors={sensors}
@@ -184,12 +193,11 @@ export default function KanbanBoard({defaultCols, defaultBugs, members, handleEd
                                 createBug={handleCreateBug} />
                         )}
                         {activeBug && (
-                            <BugSection bug={activeBug} />
+                            <BugSection bug={activeBug as IBug} />
                         )}
                     </DragOverlay>,
                     document.body
                 )}
             </DndContext>
-        </div>
     )
 }

@@ -4,7 +4,6 @@ import {Dialog, DialogContent, DialogHeader, DialogTrigger} from "@/components/u
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaUserPlus} from "react-icons/fa";
 import React, {SyntheticEvent, useState} from "react";
-import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useForm} from "react-hook-form";

@@ -6,9 +6,9 @@ import {revalidatePath} from "next/cache";
 import {columnSchema, ColumnSchema} from "@/modules/project/column.schema";
 import {generateSignedUrl} from "@/lib/helpers";
 import {Resend} from "resend";
-import ProjectInvitationTemplate from "@/components/email-templates/project-invitation-template";
 import {Project, User} from "@prisma/client";
 import {createBugSchema, CreateBugSchema} from "@/modules/project/bug.schema";
+import InviteMagicLinkEmail from "@/components/project-magic-link";
 
 export async function createProject(projectDTO: ProjectDTO) {
     const project = prisma.project.create({
@@ -110,16 +110,14 @@ export async function createProjectInvitation(userEmail: string, projectSlug: st
             })
         }
     } else {
-        await prisma.projectInvitation.create({
-            data: {
-                url: url,
-                project_id: project?.id as number,
-                expiration: newExpirationDate,
-                email: userEmail
-            }
-        })
+        await resend.emails.send({
+            from: 'Acme <onboarding@resend.dev>',
+            to: ['delivered@resend.dev'],
+            subject: 'Project invitation',
+            react: InviteMagicLinkEmail({url: url}),
+        });
     }
-    // TODO: Send email with link
+
 
     return {
         success: true,
@@ -179,6 +177,19 @@ export async function getProjectBugsBySlug(slug: string) {
     }).bugs({
         orderBy: {
             order_in_column: 'asc'
+        },
+        include: {
+            developer: {
+                select: {
+                    image: true,
+                    name: true
+                }
+            },
+            reporter: {
+                select: {
+                    name: true
+                }
+            }
         }
     })
 }

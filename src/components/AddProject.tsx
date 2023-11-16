@@ -151,7 +151,7 @@ export default function AddProject() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" disabled={isLoading}>
+                        <Button disabled={isLoading}>
                             {
                                 isLoading &&
                                 <Icons.spinner />

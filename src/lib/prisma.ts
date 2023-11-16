@@ -23,7 +23,28 @@ async function getObserverInstance(className: string): Promise<Observer> {
 let prisma: PrismaClient;
 
 if (process.env.NODE_ENV === "production") {
-    prisma = new PrismaClient() as PrismaClient;
+    prisma = new PrismaClient().$extends({
+        query: {
+            async $allOperations({model, operation, args, query}) {
+
+                const observerClassName = `${model?.toLowerCase()}.observer`;
+                const result = await query(args);
+
+                try {
+                    const observer = await getObserverInstance(observerClassName);
+
+                    const observerOperation: string = `${operation}d`;
+
+                    if (typeof observer[observerOperation] === 'function') {
+                        await observer[observerOperation](result);
+                    }
+
+                } catch {
+                }
+                return result;
+            }
+        }
+    }) as PrismaClient;
 } else {
     const globalWithPrisma = global as typeof globalThis & {
         prisma: PrismaClient;

@@ -20,6 +20,14 @@ import {authOptions} from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import KanbanBoard from "@/components/project/KanbanBoard";
 import {BoardColumn, Bug} from "@prisma/client";
+import React, {Suspense} from "react";
+import {Skeleton} from "@/components/ui/skeleton";
+import {Separator} from "@/components/ui/separator";
+import LoadingBoard from "@/components/LoadingBoard";
+import {FaUserPlus} from "react-icons/fa";
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 
 export default async function Dashboard({params}: {
@@ -129,7 +137,34 @@ export default async function Dashboard({params}: {
         }
     }
     return (
-       <KanbanBoard handleUpdateBugsOrder={handleUpdateBugsOrder} handleUpdateColumnOrder={handleUpdateColumnOrder} defaultCols={project?.columns!} defaultBugs={bugs!} handleDeleteColumn={handleDeleteColumn} handleEditColumn={handleEditColumn} handleCreateBug={handleCreateBug} members={project?.projectMembership!} />
+        <>
+            <Suspense fallback={<LoadingBoard />}>
+                <div className="flex-1 flex min-h-screen m-auto items-center w-full overflow-x-auto overflow-y-hidden px-[40px]">
+                    <div className="flex-col">
+                        <div className="flex space-x-2 mb-3">
+                            {project?.projectMembership.map(member => (
+                                <TooltipProvider key={member.id}>
+                                    <Tooltip delayDuration={400}>
+                                        <TooltipTrigger asChild>
+                                            <Avatar>
+                                                <AvatarImage src={member.user.image!} alt={member.user.name!} />
+                                            </Avatar>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top">
+                                            <p>{member.user.name}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            ))}
+
+
+                            <InviteUser handleInviteUser={handleInviteUser} />
+                        </div>
+                        <KanbanBoard handleUpdateBugsOrder={handleUpdateBugsOrder} handleUpdateColumnOrder={handleUpdateColumnOrder} defaultCols={project?.columns!} defaultBugs={bugs!} handleDeleteColumn={handleDeleteColumn} handleEditColumn={handleEditColumn} handleCreateBug={handleCreateBug} members={project?.projectMembership!} />
+                    </div>
+                </div>
+            </Suspense>
+        </>
 
     // <div className="flex flex-col w-auto">
     //     <AddColumn createNewColumn={handleCreateNewColumn} />

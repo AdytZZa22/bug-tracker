@@ -1,4 +1,4 @@
-import {ProjectRole} from "@prisma/client";
+import {Bug, ProjectRole} from "@prisma/client";
 
 export type Id = string | number;
 
@@ -21,4 +21,15 @@ export interface IMember {
     user_id: number,
     project_id: number,
     role: ProjectRole
+}
+
+export interface IBug extends Bug {
+    developer: {
+        name: string
+        image?: string
+    },
+    reporter: {
+        name: string,
+        image?: string
+    }
 }
