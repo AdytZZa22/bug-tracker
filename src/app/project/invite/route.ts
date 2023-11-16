@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL(`/project/${project.slug}`, request.url))
 
     } catch (e) {
-        redirect("/project/")
+        console.error(e)
+        redirect("/")
     }
 }
