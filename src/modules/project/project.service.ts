@@ -126,7 +126,6 @@ export async function createProjectInvitation(userEmail: string, projectSlug: st
             react: InviteMagicLinkEmail({url: url}),
         });
 
-        console.log(data)
     }
 
 
