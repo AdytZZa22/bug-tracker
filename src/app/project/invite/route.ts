@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
 
 
 
+
         await prisma.projectInvitation.deleteMany({
             where: {
                 project_id: project.id,
