@@ -17,11 +17,9 @@ export async function generateSignedUrl<TData extends ParsedUrlQueryInput>(data:
         throw new Error("Invalid date format")
     }
 
+
+    const signature = await serializeAndSign(data, expirationTime, secret);
     const serializedData = queryString.stringify(data);
-
-    const signature = crypto.createHmac('sha256', secret).update(`${serializedData}:${expirationTime}`).digest('hex')
-
-    console.log("SECRET USED TO HASH " + secret)
 
     return `${baseURL}/${route}?${serializedData}&exp=${expirationTime}&signature=${signature}`
 }
@@ -49,8 +47,8 @@ export async function validateSignedUrl<TData extends ParsedUrlQueryInput>(url: 
 
     const serializedData = queryString.stringify(Object.fromEntries(params));
 
-    console.log(serializedData)
-    const expectedSignature = crypto.createHmac('sha256', secret).update(`${serializedData}:${expirationTime}`).digest('hex');
+    const expectedSignature = await serializeAndSign(Object.fromEntries(params), expirationTime, secret)
+
 
     console.log("SECRET USED TO DEHASH " + secret)
     console.log("Signature in the URL " + signature)
@@ -62,3 +60,10 @@ export async function validateSignedUrl<TData extends ParsedUrlQueryInput>(url: 
 
     return queryString.parse(serializedData) as TData;
 }
+
+async function serializeAndSign<TData extends ParsedUrlQueryInput>(data: TData, expirationTime: number, secret: string) {
+    const sortedKeys = Object.keys(data).sort();
+    const serializedData = sortedKeys.map(key => `${key}=${data[key]}`).join('&');
+    return crypto.createHmac('sha256', secret).update(`${serializedData}:${expirationTime}`).digest('hex');
+}
+
