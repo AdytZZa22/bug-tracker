@@ -44,7 +44,7 @@ if (process.env.NODE_ENV === "production") {
                 return result;
             }
         }
-    }) as PrismaClient;
+    }) as unknown as PrismaClient;
 } else {
     const globalWithPrisma = global as typeof globalThis & {
         prisma: PrismaClient;
