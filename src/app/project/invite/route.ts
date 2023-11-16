@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
 
         if(!invitation) redirect("/")
 
+        console.log(project.slug)
+
 
 
 
