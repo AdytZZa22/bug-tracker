@@ -105,6 +105,7 @@ export default async function Dashboard({params}: {
 
         for (let i = 0; i < columns.length; i++) {
             const column = columns[i];
+
             await prisma.boardColumn.update({
                 where: {
                     id: column.id,
@@ -155,7 +156,7 @@ export default async function Dashboard({params}: {
 
                             <InviteUser handleInviteUser={handleInviteUser} />
                         </div>
-                        <KanbanBoard handleUpdateBugsOrder={handleUpdateBugsOrder} handleUpdateColumnOrder={handleUpdateColumnOrder} defaultCols={project?.columns!} defaultBugs={bugs!} handleDeleteColumn={handleDeleteColumn} handleEditColumn={handleEditColumn} handleCreateBug={handleCreateBug} members={project?.projectMembership!} />
+                        <KanbanBoard handleCreateNewColumn={handleCreateNewColumn} handleUpdateBugsOrder={handleUpdateBugsOrder} handleUpdateColumnOrder={handleUpdateColumnOrder} defaultCols={project?.columns!} defaultBugs={bugs!} handleDeleteColumn={handleDeleteColumn} handleEditColumn={handleEditColumn} handleCreateBug={handleCreateBug} members={project?.projectMembership!} />
                     </div>
                 </div>
             </Suspense>

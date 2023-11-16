@@ -56,7 +56,7 @@ export default function AddColumn({createNewColumn}: Props) {
         <Dialog onOpenChange={setOpen} open={open}>
             <DialogTrigger>
                 <Button asChild>
-                    <div>
+                    <div className="w-[300px]">
                         Create Column
                     </div>
                 </Button>

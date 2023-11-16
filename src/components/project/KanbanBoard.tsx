@@ -19,6 +19,8 @@ import React, {useEffect, useMemo, useState} from "react";
 import {IBug, IMember} from "@/types";
 import {createPortal} from "react-dom";
 import BugSection from "@/components/project/BugSection";
+import AddColumn from "@/components/project/AddColumn";
+import {ClientColumnSchema} from "@/modules/project/column.schema";
 
 interface ExtendedBoardColumn extends BoardColumn {}
 interface Props {
@@ -30,9 +32,10 @@ interface Props {
     members: IMember[]
     handleUpdateColumnOrder: (columns: BoardColumn[]) => Promise<void>
     handleUpdateBugsOrder: (bugs: Bug[]) => Promise<void>
+    handleCreateNewColumn: (data: ClientColumnSchema) => Promise<void>
 }
 
-export default function KanbanBoard({defaultCols, defaultBugs, members, handleEditColumn, handleUpdateColumnOrder, handleDeleteColumn, handleCreateBug, handleUpdateBugsOrder}: Props) {
+export default function KanbanBoard({defaultCols, defaultBugs, members, handleEditColumn, handleUpdateColumnOrder, handleDeleteColumn, handleCreateBug, handleUpdateBugsOrder, handleCreateNewColumn}: Props) {
 
     const [columns, setColumns] = useState<ExtendedBoardColumn[]>([]);
     const [bugs, setBugs] = useState<Bug[]>([]);
@@ -175,6 +178,9 @@ export default function KanbanBoard({defaultCols, defaultBugs, members, handleEd
                                     editColumnName={handleEditColumn}
                                     createBug={handleCreateBug} />
                             ))}
+                            <div className="flex-none mt-4">
+                                <AddColumn createNewColumn={handleCreateNewColumn} />
+                            </div>
                         </SortableContext>
                     </div>
                 </div>
