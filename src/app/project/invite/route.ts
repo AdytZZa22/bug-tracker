@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
         if(!project || !user) return NextResponse.redirect(new URL(`/login`, request.url))
 
 
+
         await prisma.projectInvitation.deleteMany({
             where: {
                 project_id: project.id,
