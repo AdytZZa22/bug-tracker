@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
         const project = await createProject(projectData);
 
 
-        revalidatePath("/", "layout")
         return NextResponse.json({
             success: true,
             project: project,

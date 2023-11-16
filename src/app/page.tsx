@@ -4,7 +4,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { BsFillBarChartFill } from "react-icons/bs";
-import { getUserProjects } from "@/modules/project/project.service";
+import {createProject, getUserProjects} from "@/modules/project/project.service";
+import {CreateProjectSchema, createProjectWithoutOwnerSchema, ProjectDTO} from "@/modules/project/project.schema";
+import {NextResponse} from "next/server";
+import {revalidatePath} from "next/cache";
 
 export default async function Home() {
 
@@ -13,6 +16,45 @@ export default async function Home() {
     const userProjects = await getUserProjects(session?.user.id as number)
 
 
+    async function handleCreateProject(data: CreateProjectSchema) {
+        "use server"
+
+        const result = createProjectWithoutOwnerSchema.safeParse(data);
+
+
+        if(!result.success) {
+            return result.error
+        }
+
+        const projectData: ProjectDTO = {
+            ...data,
+            owner_id: session?.user.id as number
+        }
+
+        try {
+            await createProject(projectData);
+
+
+            revalidatePath("/");
+           return {
+               success: true,
+           }
+        } catch (e: any) {
+            if(e.code === "P2002") {
+                return {
+                    success: false,
+                    field: "slug",
+                    msg: "Slug is already used."
+                }
+            } else {
+                console.error('Error creating project:', e);
+                return {
+                    success: false,
+                    error: 'An unexpected error occurred.'
+                }
+            }
+        }
+    }
   return (
     <>
         {/* Main content */}
@@ -21,7 +63,7 @@ export default async function Home() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mt-4">
 
-                <AddProject />
+                <AddProject handleCreateProject={handleCreateProject} />
                 {userProjects?.map((project) => {
                     return <div key={project.id} className="relative rounded-lg border border-stone-200 pb-10 shadow-md transition-all hover:shadow-xl dark:border-stone-700 dark:hover:border-white">
                         <Image

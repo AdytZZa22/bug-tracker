@@ -27,7 +27,11 @@ import {CreateProjectSchema, createProjectWithoutOwnerSchema} from "@/modules/pr
 import { Textarea } from "./ui/textarea"
 
 
-export default function AddProject() {
+
+interface Props {
+    handleCreateProject: (data: CreateProjectSchema) => Promise<object>
+}
+export default function AddProject({handleCreateProject}: Props) {
     const [open, setOpen] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -54,39 +58,24 @@ export default function AddProject() {
 
         setIsLoading(true)
         try {
-            const res = await fetch('/api/v1/project/create', {
-                method: "POST",
-                body: JSON.stringify(values),
-                next: {
-                    tags: ['projects']
-                },
-                cache: "no-cache"
-            })
-            const data: {
-                success: boolean,
-                field: "slug" | "name",
-                msg: string | undefined
-            } = await res.json()
+            await handleCreateProject(values)
 
-            if(!data.success && data.field) {
-                form.setError(data.field, {
-                    type: "manual",
-                    message: data.msg
-                })
-            } else {
+            toast({
+                title: "✅ Success",
+                description: "Project has been created successfully",
+            })
+
+            setOpen(false)
+
+        } catch (e) {
+            if(e instanceof Error) {
                 toast({
-                    title: "✅ Success",
-                    description: "Project has been created successfully",
+                    title: "❌ Error",
+                    description: e.message
                 })
             }
-        } catch (e) {
-            toast({
-                title: "Error",
-                description: "Something went wrong. Try again later."
-            })
         } finally {
             setIsLoading(false)
-
         }
     }
 

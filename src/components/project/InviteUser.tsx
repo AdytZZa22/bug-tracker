@@ -95,13 +95,11 @@ export default function InviteUser({ handleInviteUser }: Props) {
                             )}
                         />
                         <Button className="mt-2" disabled={isLoading}>
-                           <div>
-                               {
-                                   isLoading &&
-                                   <Icons.spinner />
-                               }
-                               Submit
-                           </div>
+                           {
+                               isLoading &&
+                               <Icons.spinner />
+                           }
+                           Submit
                         </Button>
                     </form>
                 </Form>

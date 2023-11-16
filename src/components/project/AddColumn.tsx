@@ -38,7 +38,7 @@ export default function AddColumn({createNewColumn}: Props) {
 
             toast({
                 title: "✅ Success",
-                description: "Column has been added sucessfully",
+                description: "Column has been added successfully",
             })
         } catch (e) {
 
