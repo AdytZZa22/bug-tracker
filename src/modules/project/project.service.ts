@@ -110,12 +110,23 @@ export async function createProjectInvitation(userEmail: string, projectSlug: st
             })
         }
     } else {
-        await resend.emails.send({
-            from: 'Acme <onboarding@resend.dev>',
+        await prisma.projectInvitation.create({
+            data: {
+                expiration: newExpirationDate,
+                url: url,
+                project_id: project?.id!,
+                email: userEmail
+            }
+        })
+
+        const data = await resend.emails.send({
+            from: 'Acme <admin@think-it.app>',
             to: [userEmail],
             subject: 'Project invitation',
             react: InviteMagicLinkEmail({url: url}),
         });
+
+        console.log(data)
     }
 
 
