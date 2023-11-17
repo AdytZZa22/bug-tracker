@@ -31,5 +31,8 @@ export interface IBug extends Bug {
     reporter: {
         name: string,
         image?: string
+    },
+    column: {
+        name: string
     }
 }

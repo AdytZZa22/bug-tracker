@@ -197,6 +197,12 @@ export async function getProjectBugsBySlug(slug: string) {
             },
             reporter: {
                 select: {
+                    name: true,
+                    image: true
+                }
+            },
+            column: {
+                select: {
                     name: true
                 }
             }

@@ -21,6 +21,9 @@ import {createPortal} from "react-dom";
 import BugSection from "@/components/project/BugSection";
 import AddColumn from "@/components/project/AddColumn";
 import {ClientColumnSchema} from "@/modules/project/column.schema";
+import {useAtom} from "jotai";
+import {activeBugAtom, modalAtom} from "@/store";
+import BugSheet from "@/components/project/BugSheet";
 
 interface ExtendedBoardColumn extends BoardColumn {}
 interface Props {
@@ -43,7 +46,6 @@ export default function KanbanBoard({defaultCols, defaultBugs, members, handleEd
 
     const [activeColumn, setActiveColumn] = useState<ExtendedBoardColumn | null>(null);
     const [activeBug, setActiveBug] = useState<Bug | null>(null);
-
 
 
     const sensors = useSensors(
@@ -184,6 +186,10 @@ export default function KanbanBoard({defaultCols, defaultBugs, members, handleEd
                         </SortableContext>
                     </div>
                 </div>
+
+
+                <BugSheet />
+
 
                 {typeof window === "object" && createPortal(
                     <DragOverlay>
