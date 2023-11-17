@@ -4,14 +4,19 @@ import Image from "next/image";
 import React from "react";
 import {useAtom} from "jotai";
 import {activeBugAtom, modalAtom} from "@/store";
+import {useSession} from "next-auth/react";
+import {Textarea} from "@/components/ui/textarea";
+import {Button} from "@/components/ui/button";
 
 export default function BugSheet() {
 
     const [modalOpen, setModalOpen] = useAtom(modalAtom)
     const [modalBug] = useAtom(activeBugAtom)
+
+    const session = useSession()
     return (
         <Sheet onOpenChange={setModalOpen} open={modalOpen}>
-            <SheetContent className="sm:max-w-[550px] overflow-y-auto">
+            <SheetContent className="sm:max-w-[550px] overflow-y-auto flex flex-col justify-between">
                 <SheetHeader className="font-bold text-2xl">
                     {modalBug?.title}
                 </SheetHeader>
@@ -43,12 +48,18 @@ export default function BugSheet() {
                         <Label className="font-bold">Status:</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <p>{modalBug?.column.name}</p>
+                        <p>{modalBug?.status}</p>
                     </div>
                 </div>
 
 
                 <div className="mt-10" dangerouslySetInnerHTML={{__html: modalBug?.description!}} />
+
+                <div className="mt-auto flex items-center space-x-4">
+                    <Image className="rounded-full" width={30} height={30} src={session.data?.user.image!} alt={session.data?.user.name!} />
+                    <Textarea placeholder="Insert your comment here" rows={1} />
+                </div>
+                <Button>Comment</Button>
             </SheetContent>
         </Sheet>
     )

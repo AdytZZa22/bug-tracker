@@ -18,7 +18,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement>{
 }
 
 
-const BugSection = React.forwardRef<HTMLDivElement, Props>(({bug, ...props}) => {
+const BugSection = React.forwardRef<HTMLDivElement, Props>(({bug, ...props}, sectionRef) => {
 
 
     const[mouseOver, setMouseIsOver] = useState<boolean>(false)
@@ -72,7 +72,7 @@ const BugSection = React.forwardRef<HTMLDivElement, Props>(({bug, ...props}) => 
               }}
               className="p-2.5 items-center bg-white h-[150px] min-h-[150px] text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-gray-300 cursor-grab relative"
         >
-            <CardTitle className="text-2xl">{bug?.title}</CardTitle>
+            <CardTitle ref={sectionRef} className="text-2xl">{bug?.title}</CardTitle>
             <CardDescription>
                 {bug?.reporter.name}, {moment(bug?.created_at).fromNow()}
             </CardDescription>

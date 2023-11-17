@@ -7,6 +7,7 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/lib/auth";
 import {getUserProjects} from "@/modules/project/project.service";
 import {Project} from "@prisma/client";
+import {AuthProvider} from "@/components/AuthProvider";
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'] })
 
@@ -36,11 +37,13 @@ export default async function RootLayout({
         <meta name="referrer" content="no-referrer" />
       </head>
       <body className={`${poppins.className}`}>
-        <Toaster />
-        <main className="flex">
-          {session && <Sidebar projects={projects}/>}
-          {children}
-        </main>
+      <AuthProvider>
+          <Toaster />
+          <main className="flex">
+              {session && <Sidebar projects={projects}/>}
+              {children}
+          </main>
+      </AuthProvider>
       </body>
     </html>
   )

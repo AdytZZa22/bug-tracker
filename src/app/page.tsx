@@ -8,6 +8,7 @@ import {createProject, getUserProjects} from "@/modules/project/project.service"
 import {CreateProjectSchema, createProjectWithoutOwnerSchema, ProjectDTO} from "@/modules/project/project.schema";
 import {NextResponse} from "next/server";
 import {revalidatePath} from "next/cache";
+import {ZodError} from "zod";
 
 export default async function Home() {
 
@@ -16,14 +17,22 @@ export default async function Home() {
     const userProjects = await getUserProjects(session?.user.id as number)
 
 
-    async function handleCreateProject(data: CreateProjectSchema) {
+    async function handleCreateProject(data: CreateProjectSchema): Promise<{
+        success: boolean
+        msg?: string
+        field?: string
+        error?: string | ZodError
+    }> {
         "use server"
 
         const result = createProjectWithoutOwnerSchema.safeParse(data);
 
 
         if(!result.success) {
-            return result.error
+            return {
+                success: false,
+                error: result.error
+            }
         }
 
         const projectData: ProjectDTO = {

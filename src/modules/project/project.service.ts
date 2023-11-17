@@ -11,11 +11,11 @@ import {createBugSchema, CreateBugSchema} from "@/modules/project/bug.schema";
 import InviteMagicLinkEmail from "@/components/project-magic-link";
 
 export async function createProject(projectDTO: ProjectDTO) {
-    const project = prisma.project.create({
+    const project = await prisma.project.create({
         data: projectDTO
     })
 
-    revalidatePath("/");
+
 
     return project;
 }

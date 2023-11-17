@@ -25,11 +25,17 @@ import {Icons} from "@/components/Icons";
 import {useToast} from "@/components/ui/use-toast";
 import {CreateProjectSchema, createProjectWithoutOwnerSchema} from "@/modules/project/project.schema";
 import { Textarea } from "./ui/textarea"
+import {ZodError} from "zod";
 
 
 
 interface Props {
-    handleCreateProject: (data: CreateProjectSchema) => Promise<object>
+    handleCreateProject: (data: CreateProjectSchema) => Promise<{
+        success: boolean
+        msg?: string
+        field?: string
+        error?: string | ZodError
+    }>
 }
 export default function AddProject({handleCreateProject}: Props) {
     const [open, setOpen] = useState<boolean>(false)
@@ -58,7 +64,13 @@ export default function AddProject({handleCreateProject}: Props) {
 
         setIsLoading(true)
         try {
-            await handleCreateProject(values)
+            const data = await handleCreateProject(values)
+
+            if(!data.success) {
+                return form.setError("slug", {
+                    message: data.msg
+                })
+            }
 
             toast({
                 title: "✅ Success",
