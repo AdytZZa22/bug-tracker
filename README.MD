@@ -2,6 +2,12 @@
 
 Acest document servește ca punct central de informare și ghid pentru utilizarea și înțelegerea aplicației.
 
+
+## Demo
+
+Pentru a vedea aplicația în acțiune, vizitați [Bug tracker](https://bug-tracker-ten-nu.vercel.app/).
+
+---
 ## Instrucțiuni de Instalare
 
 Pentru a instala și rula această aplicație Next.js pe sistemul dvs., urmați pașii de mai jos:
