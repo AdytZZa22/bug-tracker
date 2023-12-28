@@ -60,7 +60,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   projectsOwned Project[]
-  comments      Comments[]
+  comments      Comment[]
   bugsReported  Bug[]               @relation("BugReporter")
   bugsAssigned  Bug[]               @relation("BugDeveloper")
   projects      ProjectMembership[]
@@ -118,7 +118,7 @@ model Bug {
   reporter        User         @relation("BugReporter", fields: [reporter_id], references: [id])
   developer       User?        @relation("BugDeveloper", fields: [developer_id], references: [id])
   project         Project      @relation(fields: [project_id], references: [id], onDelete: Cascade)
-  comments        Comments[]
+  comments        Comment[]
   column          BoardColumn? @relation(fields: [column_id], references: [id])
   column_id       Int?
 
@@ -140,13 +140,14 @@ model Project {
   @@map("projects")
 }
 
-model Comments {
-  id      Int    @id @default(autoincrement())
-  body    String
-  user_id Int
-  bug_id  Int
-  user    User   @relation(fields: [user_id], references: [id])
-  bug     Bug    @relation(fields: [bug_id], references: [id])
+model Comment {
+  id         Int      @id @default(autoincrement())
+  body       String
+  user_id    Int
+  bug_id     Int
+  user       User     @relation(fields: [user_id], references: [id])
+  bug        Bug      @relation(fields: [bug_id], references: [id])
+  created_at DateTime @default(now())
 
   @@map("comments")
 }

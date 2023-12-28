@@ -2,22 +2,18 @@
 import {isBefore} from 'date-fns';
 import prisma from '@/lib/prisma';
 import {ProjectDTO} from './project.schema';
-import {revalidatePath} from "next/cache";
 import {columnSchema, ColumnSchema} from "@/modules/project/column.schema";
 import {generateSignedUrl} from "@/lib/helpers";
 import {Resend} from "resend";
 import {Project, User} from "@prisma/client";
 import {createBugSchema, CreateBugSchema} from "@/modules/project/bug.schema";
 import InviteMagicLinkEmail from "@/components/project-magic-link";
+import {commentSchema, CommentSchema} from "@/modules/project/comment.schema";
 
 export async function createProject(projectDTO: ProjectDTO) {
-    const project = await prisma.project.create({
+    return prisma.project.create({
         data: projectDTO
-    })
-
-
-
-    return project;
+    });
 }
 
 export async function createBug(bugDTO: CreateBugSchema)
@@ -63,6 +59,19 @@ export async function inviteUser(user: User, project: Project) {
     })
 }
 
+
+export async function createNewComment(comment: CommentSchema) {
+    const result = commentSchema.safeParse(comment)
+
+    if(!result.success) {
+        throw result.error
+    }
+
+    console.log(comment)
+    return prisma.comment.create({
+        data: comment
+    })
+}
 export async function createProjectInvitation(userEmail: string, projectSlug: string) {
 
     const resend = new Resend(process.env.RESEND_API_KEY)
@@ -199,6 +208,16 @@ export async function getProjectBugsBySlug(slug: string) {
                 select: {
                     name: true,
                     image: true
+                }
+            },
+            comments: {
+                include: {
+                    user: {
+                        select: {
+                            name: true,
+                            image: true
+                        }
+                    }
                 }
             },
             column: {

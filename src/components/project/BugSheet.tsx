@@ -1,19 +1,36 @@
 import {Sheet, SheetContent, SheetHeader} from "@/components/ui/sheet";
 import {Label} from "@/components/ui/label";
 import Image from "next/image";
-import React from "react";
+import React, {SyntheticEvent, useState} from "react";
 import {useAtom} from "jotai";
 import {activeBugAtom, modalAtom} from "@/store";
 import {useSession} from "next-auth/react";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
+import {Comment} from "@prisma/client";
 
-export default function BugSheet() {
+
+interface Props {
+    handleAddComment: (body: string, bugId: number) => Promise<Comment>
+
+}
+export default function BugSheet({handleAddComment}: Props) {
 
     const [modalOpen, setModalOpen] = useAtom(modalAtom)
     const [modalBug] = useAtom(activeBugAtom)
 
+    const [comment, setComment] = useState<string>("")
+
     const session = useSession()
+
+    async function handleSubmitComment(event: SyntheticEvent) {
+        event.preventDefault()
+        try {
+            await handleAddComment(comment, modalBug?.id as number)
+        } catch (e) {
+            alert("Something went wrong")
+        }
+    }
     return (
         <Sheet onOpenChange={setModalOpen} open={modalOpen}>
             <SheetContent className="sm:max-w-[550px] overflow-y-auto flex flex-col justify-between">
@@ -55,11 +72,28 @@ export default function BugSheet() {
 
                 <div className="mt-10" dangerouslySetInnerHTML={{__html: modalBug?.description!}} />
 
-                <div className="mt-auto flex items-center space-x-4">
-                    <Image className="rounded-full" width={30} height={30} src={session.data?.user.image!} alt={session.data?.user.name!} />
-                    <Textarea placeholder="Insert your comment here" rows={1} />
+                <div className="mt-auto space-y-4">
+                    {modalBug?.comments.map((comment, index) => (
+                        <div key={index} className="flex-col flex space-x-12">
+                            <div className="flex items-center space-x-4">
+                                <Image className="rounded-full" width={30} height={30} src={comment.user.image ?? ""}
+                                       alt={comment.user.name}/>
+                                <p className="ms-2">{comment.user.name}</p>
+                                <span className="font-light">{comment.created_at.toLocaleString()}</span>
+                            </div>
+                            <p>{comment.body}</p>
+                        </div>
+                    ))}
                 </div>
-                <Button>Comment</Button>
+                <div className="mt-5 flex items-center space-x-4">
+                    <Image className="rounded-full" width={30} height={30} src={session.data?.user.image!}
+                           alt={session.data?.user.name!}/>
+                    <Textarea value={comment} onChange={e => setComment(e.target.value)}
+                              placeholder="Insert your comment here" rows={1}/>
+                </div>
+                <form onSubmit={handleSubmitComment}>
+                    <Button>Comment</Button>
+                </form>
             </SheetContent>
         </Sheet>
     )

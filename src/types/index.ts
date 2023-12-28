@@ -35,4 +35,12 @@ export interface IBug extends Bug {
     column: {
         name: string
     }
+    comments: {
+        body: string
+        created_at: Date
+        user: {
+            name: string
+            image?: string
+        }
+    }[]
 }

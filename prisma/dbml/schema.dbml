@@ -101,6 +101,7 @@ Table comments {
   bug_id Int [not null]
   user users [not null]
   bug bugs [not null]
+  created_at DateTime [default: `now()`, not null]
 }
 
 Table project_columns {

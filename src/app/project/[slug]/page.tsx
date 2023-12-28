@@ -1,6 +1,6 @@
 import {
     createBug,
-    createColumn,
+    createColumn, createNewComment,
     createProjectInvitation,
     deleteColumn,
     editColumnName, getProjectBugsBySlug,
@@ -20,6 +20,7 @@ import KanbanBoard from "@/components/project/KanbanBoard";
 import {BoardColumn, Bug} from "@prisma/client";
 import React, {Suspense} from "react";
 import LoadingBoard from "@/components/LoadingBoard";
+import {CommentSchema} from "@/modules/project/comment.schema";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -71,6 +72,23 @@ export default async function Dashboard({params}: {
 
         return await createProjectInvitation(data.email, project?.slug as string);
 
+    }
+    async function handleAddComment(body: string, bugId: number) {
+        "use server"
+
+        const commentDTO: CommentSchema = {
+            body: body,
+            user_id: session.user.id as number,
+            bug_id: bugId
+        }
+
+        const response = await createNewComment(commentDTO);
+
+        revalidatePath("/project/" + params.slug)
+
+        
+
+        return response
     }
     async function handleCreateBug(data: ClientCreateBugSchema, columnId: number): Promise<void> {
         "use server"
@@ -156,7 +174,18 @@ export default async function Dashboard({params}: {
 
                             <InviteUser handleInviteUser={handleInviteUser} />
                         </div>
-                        <KanbanBoard handleCreateNewColumn={handleCreateNewColumn} handleUpdateBugsOrder={handleUpdateBugsOrder} handleUpdateColumnOrder={handleUpdateColumnOrder} defaultCols={project?.columns!} defaultBugs={bugs!} handleDeleteColumn={handleDeleteColumn} handleEditColumn={handleEditColumn} handleCreateBug={handleCreateBug} members={project?.projectMembership!} />
+                        <KanbanBoard
+                            handleAddComment={handleAddComment}
+                            handleCreateNewColumn={handleCreateNewColumn}
+                            handleUpdateBugsOrder={handleUpdateBugsOrder}
+                            handleUpdateColumnOrder={handleUpdateColumnOrder}
+                            defaultCols={project?.columns!}
+                            defaultBugs={bugs!}
+                            handleDeleteColumn={handleDeleteColumn}
+                            handleEditColumn={handleEditColumn}
+                            handleCreateBug={handleCreateBug}
+                            members={project?.projectMembership!}
+                        />
                     </div>
                 </div>
             </Suspense>

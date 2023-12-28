@@ -6,10 +6,8 @@ import Link from "next/link";
 import { BsFillBarChartFill } from "react-icons/bs";
 import {createProject, getUserProjects} from "@/modules/project/project.service";
 import {CreateProjectSchema, createProjectWithoutOwnerSchema, ProjectDTO} from "@/modules/project/project.schema";
-import {NextResponse} from "next/server";
 import {revalidatePath} from "next/cache";
 import {ZodError} from "zod";
-
 export default async function Home() {
 
 

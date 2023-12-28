@@ -98,6 +98,7 @@ CREATE TABLE "comments" (
     "body" TEXT NOT NULL,
     "user_id" INTEGER NOT NULL,
     "bug_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "comments_pkey" PRIMARY KEY ("id")
 );

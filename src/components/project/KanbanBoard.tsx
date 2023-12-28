@@ -12,7 +12,7 @@ import {
     useSensors
 } from "@dnd-kit/core";
 import {arrayMove, SortableContext, sortableKeyboardCoordinates} from "@dnd-kit/sortable";
-import {BoardColumn, Bug} from "@prisma/client";
+import {BoardColumn, Bug, Comment} from "@prisma/client";
 import KanbanColumn from "@/components/project/KanbanColumn";
 import {ClientCreateBugSchema} from "@/modules/project/bug.schema";
 import React, {useEffect, useMemo, useState} from "react";
@@ -21,8 +21,6 @@ import {createPortal} from "react-dom";
 import BugSection from "@/components/project/BugSection";
 import AddColumn from "@/components/project/AddColumn";
 import {ClientColumnSchema} from "@/modules/project/column.schema";
-import {useAtom} from "jotai";
-import {activeBugAtom, modalAtom} from "@/store";
 import BugSheet from "@/components/project/BugSheet";
 
 interface ExtendedBoardColumn extends BoardColumn {}
@@ -36,9 +34,10 @@ interface Props {
     handleUpdateColumnOrder: (columns: BoardColumn[]) => Promise<void>
     handleUpdateBugsOrder: (bugs: Bug[]) => Promise<void>
     handleCreateNewColumn: (data: ClientColumnSchema) => Promise<void>
+    handleAddComment: (body: string, bugId: number) => Promise<Comment>
 }
 
-export default function KanbanBoard({defaultCols, defaultBugs, members, handleEditColumn, handleUpdateColumnOrder, handleDeleteColumn, handleCreateBug, handleUpdateBugsOrder, handleCreateNewColumn}: Props) {
+export default function KanbanBoard({defaultCols, defaultBugs, members, handleAddComment, handleEditColumn, handleUpdateColumnOrder, handleDeleteColumn, handleCreateBug, handleUpdateBugsOrder, handleCreateNewColumn}: Props) {
 
     const [columns, setColumns] = useState<ExtendedBoardColumn[]>([]);
     const [bugs, setBugs] = useState<Bug[]>([]);
@@ -188,7 +187,9 @@ export default function KanbanBoard({defaultCols, defaultBugs, members, handleEd
                 </div>
 
 
-                <BugSheet />
+                <BugSheet
+                    handleAddComment={handleAddComment}
+                />
 
 
                 {typeof window === "object" && createPortal(
